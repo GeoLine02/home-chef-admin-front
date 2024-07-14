@@ -1,7 +1,9 @@
 import { configureStore } from "@reduxjs/toolkit";
-import restaurantReducer from "./features/restaurantSlice"
+import restaurantReducer from "./features/restaurantSlice";
+import tableReducer from "./features/tableSlice";
+
 export const store = configureStore({
-  reducer: {restaurantReducer},
+  reducer: { restaurantReducer, tableReducer },
 });
 
 export type RootState = ReturnType<typeof store.getState>;

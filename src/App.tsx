@@ -6,11 +6,13 @@ import routes from "./constants/route";
 import DashboardPage from "./pages/DashboardPage";
 import AppLayout from "./components/layouts/AppLayout";
 import RouteGuard from "./guards/RouteGuard";
+import TablePage from "./pages/TablePage";
 
 function App() {
   return (
     <div>
-      <Suspense>
+      <TablePage />
+      {/* <Suspense>
         <Routes>
           <Route
             element={
@@ -24,7 +26,7 @@ function App() {
           <Route path={routes.DASHBOARD} element={<DashboardPage />} />
           <Route path={routes.DASHBOARD} element={<DashboardPage />} />
         </Routes>
-      </Suspense>
+      </Suspense> */}
     </div>
   );
 }

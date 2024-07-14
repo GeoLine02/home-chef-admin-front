@@ -1,34 +1,55 @@
-import { Suspense } from "react";
-
-import "./App.css";
-import { Route, Routes } from "react-router-dom";
-import routes from "./constants/route";
+import { createBrowserRouter, RouterProvider } from "react-router-dom";
 import DashboardPage from "./pages/DashboardPage";
 import AppLayout from "./components/layouts/AppLayout";
 import RouteGuard from "./guards/RouteGuard";
-import TablePage from "./pages/TablePage";
+import RestaurantList from "./pages/restaurants/RestaurantList.tsx";
+import LoginPage from "./pages/LoginPage.tsx";
+import RestaurantCreate from "./pages/restaurants/RestaurantCreate.tsx";
+import RegisterPage from "./pages/RegisterPage.tsx";
+import ProductCreate from "./pages/products/ProductCreate.tsx";
+import ProductList from "./pages/products/ProductList.tsx";
+
+const router = createBrowserRouter([
+  {
+    element: (
+      <RouteGuard>
+        <AppLayout />
+      </RouteGuard>
+    ),
+    children: [
+      {
+        path: "/",
+        element: <DashboardPage />,
+      },
+      {
+        path: "/restaurants/list",
+        element: <RestaurantList />,
+      },
+      {
+        path: "/restaurants/create",
+        element: <RestaurantCreate />,
+      },
+      {
+        path: "/products/list",
+        element: <ProductList />,
+      },
+      {
+        path: "/products/create",
+        element: <ProductCreate />,
+      },
+    ],
+  },
+  {
+    path: "/login",
+    element: <LoginPage />,
+  },
+  {
+    path: "/register",
+    element: <RegisterPage />,
+  },
+]);
 
 function App() {
-  return (
-    <div>
-      <TablePage />
-      {/* <Suspense>
-        <Routes>
-          <Route
-            element={
-              <RouteGuard>
-                <AppLayout />
-              </RouteGuard>
-            }
-          >
-            <Route path={routes.DASHBOARD} element={<DashboardPage />} />
-          </Route>
-          <Route path={routes.DASHBOARD} element={<DashboardPage />} />
-          <Route path={routes.DASHBOARD} element={<DashboardPage />} />
-        </Routes>
-      </Suspense> */}
-    </div>
-  );
+  return <RouterProvider router={router} />;
 }
-
 export default App;

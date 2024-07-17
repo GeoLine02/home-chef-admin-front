@@ -36,9 +36,6 @@ const GlobalStyle = createGlobalStyle`
   transition: background-color 0.2s, border 0.2s;
 }
 
-html {
-  font-size: 62.5%;
-}
 
 body {
 font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, Arial, sans-serif;
@@ -49,7 +46,7 @@ font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, Helvetica, A
   transition: color 0.3s, background-color 0.3s;
   min-height: 100vh;
   line-height: 1.5;
-  font-size: 1.6rem;
+
 }
 
 

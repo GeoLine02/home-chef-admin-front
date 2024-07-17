@@ -8,6 +8,7 @@ import RestaurantCreate from "./pages/restaurants/RestaurantCreate.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
 import ProductCreate from "./pages/products/ProductCreate.tsx";
 import ProductList from "./pages/products/ProductList.tsx";
+import "./App.css";
 
 const router = createBrowserRouter([
   {
@@ -50,6 +51,10 @@ const router = createBrowserRouter([
 ]);
 
 function App() {
-  return <RouterProvider router={router} />;
+  return (
+    <div>
+      <RouterProvider router={router} />;
+    </div>
+  );
 }
 export default App;

@@ -16,7 +16,7 @@ const DropDown = ({
   handleToggleDropDown,
 }: IDropDownProps) => {
   return (
-    <div className="bg-light_background_color  rounded-md w-fit p-2 relative border-2 border-border_color hover:bg-dark_backgorund_color">
+    <div className="bg-light_background_color  rounded-md min-w-16 text-center p-2 relative border-2 border-border_color hover:bg-dark_backgorund_color">
       <button onClick={handleToggleDropDown}>{selectedOption}</button>
       <ul className="absolute left-0 bg-light_background_color w-full text-center rounded-b-md">
         {isDropDownOpen &&

@@ -1,20 +1,25 @@
 import { ChangeEvent, useState } from "react";
 import { ITableColumn } from "../../../types/table";
 import DropDown from "../DropDown";
+import { useDispatch, useSelector } from "react-redux";
+import { AppDispatch, RootState } from "../../../store/store";
+import { setSelectedOption } from "../../../store/features/restaurantSlice";
 
 interface IDataFilter {
   columns: ITableColumn[];
+  setSearch: (payload: string) => void;
 }
 
-const DataFilter = ({ columns }: IDataFilter) => {
+const DataFilter = ({ columns, setSearch }: IDataFilter) => {
+  const dispatch = useDispatch<AppDispatch>();
   const [toggleFilter, setToggleFilter] = useState<boolean>(false);
-  const [selectedOption, setSelectedOption] = useState<"Nothing" | string>(
-    "nothing"
+
+  const selectedOption = useSelector(
+    (state: RootState) => state.restaurantReducer.filterOptions
   );
-  const [search, setSearch] = useState<string>("");
-  console.log(search);
+
   const handleSelectOption = (option: string) => {
-    setSelectedOption(option);
+    dispatch(setSelectedOption(option));
     setToggleFilter(!toggleFilter);
   };
 

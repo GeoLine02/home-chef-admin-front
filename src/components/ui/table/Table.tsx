@@ -16,16 +16,21 @@ interface IReusableTableProps {
   setCurrentPage: React.Dispatch<SetStateAction<number>>;
   setSearch: (payload: string) => void;
   actions: ITableAction[];
+  setSelectedFilterOption: React.Dispatch<
+    React.SetStateAction<string | string[]>
+  >;
+  selectedFilterOption: string | string[];
 }
 
 const Table = ({
   columns,
   data,
   tableHeader,
-  currentPage,
   setCurrentPage,
   setSearch,
   actions,
+  setSelectedFilterOption,
+  selectedFilterOption,
 }: IReusableTableProps) => {
   const [rows, setRows] = useState<ITableData | null>(data);
 
@@ -70,7 +75,12 @@ const Table = ({
           <DataToPdf />
           <h1 className="text-2xl text-black">{tableHeader}</h1>
         </div>
-        <DataFilter columns={columns} setSearch={setSearch} />
+        <DataFilter
+          columns={columns}
+          setSearch={setSearch}
+          selectedFilterOption={selectedFilterOption}
+          setSelectFilterOption={setSelectedFilterOption}
+        />
       </div>
       <div className="overflow-x-auto rounded-2xl border-2 border-border_color">
         <table className="min-w-full divide-y divide-divider_color overflow-y-auto">

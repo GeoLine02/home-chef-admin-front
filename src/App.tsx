@@ -4,11 +4,11 @@ import AppLayout from "./components/layouts/AppLayout";
 import RouteGuard from "./guards/RouteGuard";
 import RestaurantList from "./pages/restaurants/RestaurantList.tsx";
 import LoginPage from "./pages/LoginPage.tsx";
-import RestaurantCreate from "./pages/restaurants/RestaurantCreate.tsx";
 import RegisterPage from "./pages/RegisterPage.tsx";
 import ProductCreate from "./pages/products/ProductCreate.tsx";
 import ProductList from "./pages/products/ProductList.tsx";
 import "./App.css";
+import RestaurantNew from "./pages/restaurants/RestaurantNew.tsx";
 
 const router = createBrowserRouter([
   {
@@ -28,7 +28,7 @@ const router = createBrowserRouter([
       },
       {
         path: "/restaurants/create",
-        element: <RestaurantCreate />,
+        element: <RestaurantNew />,
       },
       {
         path: "/products/list",

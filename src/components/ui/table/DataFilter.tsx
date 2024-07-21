@@ -1,35 +1,26 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent } from "react";
 import { ITableColumn } from "../../../types/table";
 import DropDown from "../DropDown";
-import { useDispatch, useSelector } from "react-redux";
-import { AppDispatch, RootState } from "../../../store/store";
-import { setSelectedOption } from "../../../store/features/restaurantSlice";
-
 interface IDataFilter {
   columns: ITableColumn[];
   setSearch: (payload: string) => void;
+  selectedFilterOption: string | string[];
+  setSelectFilterOption: React.Dispatch<
+    React.SetStateAction<string | string[]>
+  >;
 }
 
-const DataFilter = ({ columns, setSearch }: IDataFilter) => {
-  const dispatch = useDispatch<AppDispatch>();
-  const [toggleFilter, setToggleFilter] = useState<boolean>(false);
-
-  const selectedOption = useSelector(
-    (state: RootState) => state.restaurantReducer.filterOptions
-  );
-
-  const handleSelectOption = (option: string) => {
-    dispatch(setSelectedOption(option));
-    setToggleFilter(!toggleFilter);
-  };
-
-  const handleToggleFilter = () => {
-    setToggleFilter(!toggleFilter);
-  };
-
+const DataFilter = ({
+  columns,
+  setSearch,
+  setSelectFilterOption,
+  selectedFilterOption,
+}: IDataFilter) => {
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   };
+
+  const handleChange = () => {};
 
   return (
     <div className="flex gap-2 items-center">
@@ -37,10 +28,10 @@ const DataFilter = ({ columns, setSearch }: IDataFilter) => {
         <h1>Filter by:</h1>
         <DropDown
           options={columns}
-          handleSelectOption={handleSelectOption}
-          handleToggleDropDown={handleToggleFilter}
-          selectedOption={selectedOption}
-          isDropDownOpen={toggleFilter}
+          onChange={handleChange}
+          selected={selectedFilterOption}
+          setSelected={setSelectFilterOption}
+          multiple={false}
         />
       </div>
 

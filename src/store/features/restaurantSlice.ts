@@ -1,29 +1,30 @@
 import { AsyncThunk, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ITableData } from "../../types/table";
-import { restaurantListService } from "../../services/restaurants";
+import {
+  restaurantDeleteService,
+  restaurantListService,
+} from "../../services/restaurants";
 
 type InitialStateType = {
   restaurantList: ITableData | null;
-  filterOptions: "Nothing" | string;
   toggleConfirmationModal: boolean;
   search: string;
   isDataFetching: boolean;
-  seelectRestaurantID: string | null;
+  selectRestaurantID: string | null;
   status: "idle" | "pending" | "successful" | "rejected";
   error: unknown | null;
 };
 export interface IRestaurantListPayloadCreator {
   page: number;
   limit: number;
-  filterBy: string;
+  filterBy: string | string[];
   search: string;
 }
 
 const initialState: InitialStateType = {
   restaurantList: null,
-  filterOptions: "Nothing",
   toggleConfirmationModal: false,
-  seelectRestaurantID: null,
+  selectRestaurantID: null,
   search: "",
   isDataFetching: false,
   status: "idle",
@@ -51,13 +52,23 @@ export const fetchRestaurantList: AsyncThunk<
   }
 );
 
+export const deleteRestaurant: AsyncThunk<object, string, object> =
+  createAsyncThunk("restaurant/delete", async (id: string) => {
+    try {
+      const resp = await restaurantDeleteService(id);
+      return resp;
+    } catch (error) {
+      console.log(error);
+    }
+  });
+
 const restaurantSlice = createSlice({
   name: "restaurant",
   initialState,
   reducers: {
-    setSelectedOption: (state, action) => {
-      state.filterOptions = action.payload;
-    },
+    // setSelectedOption: (state, action) => {
+    //   state.filterOptions = action.payload;
+    // },
     setSearch: (state, action) => {
       state.search = action.payload;
     },
@@ -65,7 +76,7 @@ const restaurantSlice = createSlice({
       state.toggleConfirmationModal = !state.toggleConfirmationModal;
     },
     selectRestaurantID: (state, action) => {
-      state.seelectRestaurantID = action.payload;
+      state.selectRestaurantID = action.payload;
     },
   },
   extraReducers: (builder) => {
@@ -84,12 +95,31 @@ const restaurantSlice = createSlice({
         state.status = "rejected";
         state.isDataFetching = false;
         state.error = action.error;
+      })
+      // restaurant delete
+      .addCase(deleteRestaurant.pending, (state) => {
+        state.status = "pending";
+        state.isDataFetching = true;
+      })
+      .addCase(deleteRestaurant.fulfilled, (state) => {
+        if (state.restaurantList) {
+          state.restaurantList.data = state.restaurantList.data.filter(
+            (item) => item.id !== state.selectRestaurantID
+          );
+          state.status = "successful";
+          state.isDataFetching = false;
+        }
+      })
+      .addCase(deleteRestaurant.rejected, (state, action) => {
+        state.status = "rejected";
+        state.isDataFetching = false;
+        state.error = action.error;
       });
   },
 });
 
 export const {
-  setSelectedOption,
+  // setSelectedOption,
   setSearch,
   toggleConfirmationModal,
   selectRestaurantID,

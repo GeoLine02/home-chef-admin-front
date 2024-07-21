@@ -40,3 +40,52 @@ export const restaurantDeleteService = async (id: string) => {
     console.log(error);
   }
 };
+
+// get restaurant types
+export const allRestaurantTypeService = async () => {
+  try {
+    const apiCallOptions = {
+      header: {
+        "Content-Type": "application/json",
+      },
+      method: "GET",
+    };
+    const resp = await http("/restaurantTypes", apiCallOptions);
+    return resp.json();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// choose restaurnt types
+export const chooseRestaurntTypeService = async (options: object) => {
+  try {
+    const apiCallOptions = {
+      header: {
+        "Content-Type": "application/json",
+      },
+      method: "POST",
+      body: JSON.stringify({ options: options }),
+    };
+    const resp = await http("/restaurantTypes/select", apiCallOptions);
+    return resp.json();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// get week days
+export const getweekDaysService = async () => {
+  try {
+    const apiCallOptions = {
+      header: {
+        "Content-Type": "application/json",
+      },
+      method: "GET",
+    };
+    const resp = await http("/days", apiCallOptions);
+    return resp.json();
+  } catch (error) {
+    console.log(error);
+  }
+};

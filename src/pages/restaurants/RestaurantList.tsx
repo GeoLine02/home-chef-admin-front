@@ -91,8 +91,6 @@ const RestaurantList = () => {
     dispatch(toggleConfirmationModal());
   };
 
-  console.log("@@@@@@@@selectedOption", selectedOption);
-
   return (
     <div>
       <Table

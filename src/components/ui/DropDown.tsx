@@ -2,6 +2,8 @@ import { useEffect, useState } from "react";
 import { TiDelete } from "react-icons/ti";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoIosArrowUp } from "react-icons/io";
+import { UseFormRegister } from "react-hook-form";
+import { IFormValues } from "../../pages/restaurants/RestaurantNew";
 
 interface IDropDownProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
@@ -10,6 +12,8 @@ interface IDropDownProps {
   setSelected: React.Dispatch<React.SetStateAction<string | string[]>>;
   multiple?: boolean;
   onChange: (selected: string | string[]) => void;
+  register: UseFormRegister<IFormValues>;
+  name: string;
 }
 
 const DropDown = ({
@@ -18,6 +22,8 @@ const DropDown = ({
   onChange,
   selected,
   setSelected,
+  register,
+  name,
 }: IDropDownProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -55,6 +61,7 @@ const DropDown = ({
   useEffect(() => {
     handleChange();
   }, [selected]);
+
   return (
     <div className="relative">
       <div className="border-2 border-border_color bg-dark_backgorund_color text-black rounded-md p-2 flex items-center justify-between">
@@ -95,7 +102,7 @@ const DropDown = ({
                 className="px-2 py-1 bg-light_background_color text-black"
                 type={multiple ? "checkbox" : "radio"}
                 id={item.accessorKey}
-                name="dropdown"
+                // name={name}
                 value={item.accessorKey}
                 checked={
                   Array.isArray(selected)
@@ -103,6 +110,7 @@ const DropDown = ({
                     : selected === item.accessorKey
                 }
                 onChange={() => handleSelect(item.accessorKey)}
+                // {...register(name, {required: true})}
               />
               <label className="text-black" htmlFor={item.accessorKey}>
                 {item.header}

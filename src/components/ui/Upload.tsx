@@ -1,9 +1,13 @@
+import { UseFormRegister } from "react-hook-form";
+import { IFormValues } from "../../pages/restaurants/RestaurantNew";
+
 interface IUpload {
+  register: UseFormRegister<IFormValues>;
   image: any;
   setImage: React.Dispatch<React.SetStateAction<null>>;
 }
 
-const Upload = ({ image, setImage }: IUpload) => {
+const Upload = ({ image, setImage, register }: IUpload) => {
   console.log(image);
   const onFileChange = (e: any) => {
     setImage(e?.target?.files[0]);
@@ -42,7 +46,13 @@ const Upload = ({ image, setImage }: IUpload) => {
             SVG, PNG, JPG or GIF (MAX. 800x400px)
           </p>
         </div>
-        <input id="dropzone-file" type="file" className="hidden" required />
+        <input
+          id="dropzone-file"
+          {...register("file", { required: true })}
+          type="file"
+          className="hidden"
+          required
+        />
       </label>
     </div>
   );

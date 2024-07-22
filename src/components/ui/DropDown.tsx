@@ -2,28 +2,23 @@ import { useEffect, useState } from "react";
 import { TiDelete } from "react-icons/ti";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoIosArrowUp } from "react-icons/io";
-import { UseFormRegister } from "react-hook-form";
-import { IFormValues } from "../../pages/restaurants/RestaurantNew";
 
 interface IDropDownProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   options: any[];
-  selected: string | string[];
-  setSelected: React.Dispatch<React.SetStateAction<string | string[]>>;
+  selected: string[];
+  setSelected: React.Dispatch<React.SetStateAction<string[]>>;
   multiple?: boolean;
-  onChange: (selected: string | string[]) => void;
-  register: UseFormRegister<IFormValues>;
+  handleWorkingDaysChange: (selected: string) => void;
   name: string;
 }
 
 const DropDown = ({
   options,
   multiple = false,
-  onChange,
+  handleWorkingDaysChange,
   selected,
   setSelected,
-  register,
-  name,
 }: IDropDownProps) => {
   const [isOpen, setIsOpen] = useState<boolean>(false);
 
@@ -31,8 +26,10 @@ const DropDown = ({
     setIsOpen(!isOpen);
   };
 
-  const handleSelect = (value: string) => {
+  /*   const handleSelect = (value: any) => {
+    console.log(multiple);
     if (multiple) {
+      console.log("selected", selected);
       setSelected((prevSelected) => {
         const newSelected = Array.isArray(prevSelected)
           ? [...prevSelected]
@@ -46,6 +43,12 @@ const DropDown = ({
     } else {
       setSelected(value);
     }
+  }; */
+  const handleSelect = (value: any) => {
+    console.log(value);
+    if (multiple) {
+      setSelected(value);
+    }
   };
 
   const handleDelete = (value: string) => {
@@ -53,14 +56,6 @@ const DropDown = ({
       setSelected(selected.filter((item) => item !== value));
     }
   };
-
-  const handleChange = () => {
-    onChange(selected);
-  };
-
-  useEffect(() => {
-    handleChange();
-  }, [selected]);
 
   return (
     <div className="relative">
@@ -102,15 +97,16 @@ const DropDown = ({
                 className="px-2 py-1 bg-light_background_color text-black"
                 type={multiple ? "checkbox" : "radio"}
                 id={item.accessorKey}
-                // name={name}
                 value={item.accessorKey}
                 checked={
                   Array.isArray(selected)
                     ? selected.includes(item.accessorKey)
                     : selected === item.accessorKey
                 }
-                onChange={() => handleSelect(item.accessorKey)}
-                // {...register(name, {required: true})}
+                onChange={() => {
+                  handleSelect(item.accessorKey),
+                    handleWorkingDaysChange(selected);
+                }}
               />
               <label className="text-black" htmlFor={item.accessorKey}>
                 {item.header}

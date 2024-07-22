@@ -1,19 +1,25 @@
-import { UseFormRegister, Path } from "react-hook-form";
-import { IFormValues } from "../../pages/restaurants/RestaurantNew";
+import { ChangeEvent } from "react";
 
 interface InputProps {
-  label: Path<IFormValues>;
-  register: UseFormRegister<IFormValues>;
+  name: string;
   required: boolean;
+  onChange: (e: ChangeEvent<HTMLInputElement>) => void;
+  value: string; // Changed to string to ensure consistency
 }
 
-const Input = ({ label, register, required }: InputProps) => (
+const Input = ({ name, required, onChange, value }: InputProps) => (
   <>
-    <label>{label}</label>
+    <label htmlFor={name}>{name}</label>
     <input
       className="w-full border-2 border-border_color rounded-xl py-2 my-1 outline-none px-4"
-      {...register(label, { required })}
+      id={name}
+      name={name}
+      value={value} // Ensure value is used here
+      placeholder={`Enter your ${name}`}
+      onChange={onChange}
+      required={required}
     />
   </>
 );
+
 export default Input;

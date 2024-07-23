@@ -9,6 +9,7 @@ import ProductCreate from "./pages/products/ProductCreate.tsx";
 import ProductList from "./pages/products/ProductList.tsx";
 import "./App.css";
 import RestaurantNew from "./pages/restaurants/RestaurantNew.tsx";
+import RestaurantEdit from "./pages/restaurants/RestaurantEdit.tsx";
 
 const router = createBrowserRouter([
   {
@@ -29,6 +30,10 @@ const router = createBrowserRouter([
       {
         path: "/restaurants/create",
         element: <RestaurantNew />,
+      },
+      {
+        path: "/restaurants/update/:id",
+        element: <RestaurantEdit />,
       },
       {
         path: "/products/list",

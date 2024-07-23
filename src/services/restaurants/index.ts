@@ -25,6 +25,22 @@ export const restaurantListService = async ({
   }
 };
 
+// create restaurant
+export const createRestaurantService = async (restaurantData: FormData) => {
+  console.log(restaurantData);
+  try {
+    const apiCallOptions = {
+      method: "POST",
+      body: restaurantData,
+    };
+    const resp = await http("/restaurant/create", apiCallOptions);
+    console.log(resp);
+    return resp;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 // delete restaurant
 export const restaurantDeleteService = async (id: string) => {
   try {

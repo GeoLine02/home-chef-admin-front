@@ -1,4 +1,4 @@
-import React, { ChangeEvent } from "react";
+import { ChangeEvent } from "react";
 
 interface IUpload {
   value: File | null;
@@ -18,7 +18,7 @@ const Upload = ({ value, onChange }: IUpload) => {
     <div className="flex items-center justify-center w-full">
       <label
         htmlFor="dropzone-file"
-        className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-green-800 dark:bg-dark_backgorund_color hover:bg-gray-100 dark:border-border_color dark:hover:border-border_color"
+        className="flex flex-col items-center justify-center w-full h-64 p-2 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-green-800 dark:bg-dark_backgorund_color hover:bg-gray-100 dark:border-border_color dark:hover:border-border_color"
       >
         <div className="flex flex-col items-center justify-center pt-5 pb-6">
           <svg

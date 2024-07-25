@@ -1,5 +1,7 @@
 import Input from "../../components/ui/Input";
 import Upload from "../../components/ui/Upload";
+import { MdDelete } from "react-icons/md";
+
 import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import DropDown from "../../components/ui/DropDown";
 import { useDispatch, useSelector } from "react-redux";
@@ -9,9 +11,15 @@ import {
   getWeekDays,
 } from "../../store/features/restaurantSettingsSlice";
 import TimeRange from "../../components/ui/TimeRange";
+import { uploadImageToFirebase } from "../../services/restaurants/firebaseApi";
 
 const RestaurantNew = () => {
-  const [image, setImage] = useState<File | null>(null);
+  const [imageCoverFile, setImageCoverFile] = useState<File | null>(null);
+  const [imageIntroFile, setImageIntroFile] = useState<File | null>(null);
+  const [imageCoverUrl, setImageCoverUrl] = useState<string>("");
+  const [imageIntroUrl, setImageIntroUrl] = useState<string>("");
+
+  console.log(imageCoverFile);
 
   const [selectedWorkingDays, setSelectedWorkingDays] = useState<string[]>([]);
   const [selectRestaurantTypes, setSelectRestaurantTypes] = useState<string[]>(
@@ -25,7 +33,8 @@ const RestaurantNew = () => {
     address: "",
     city: "",
     phone: "",
-    file: image,
+    imageCover: imageCoverUrl,
+    imageIntro: imageIntroUrl,
     workingDays: selectedWorkingDays,
     restaurantType: selectRestaurantTypes,
   });
@@ -71,7 +80,6 @@ const RestaurantNew = () => {
   };
 
   const handleRestaurantTypesChange = (selected: string) => {
-    console.log(selected);
     const newState = [...selectRestaurantTypes];
     if (newState.includes(selected)) {
       return alert(`this day is alredy exist ${selected}`);
@@ -85,18 +93,63 @@ const RestaurantNew = () => {
     setEndTime(end);
   };
 
-  const onSubmit = (e: FormEvent<HTMLFormElement>) => {
+  const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
-    // Process form data here if needed
-    console.log(restaurantValues);
-  };
+    let coverUrl = imageCoverUrl;
+    let introUrl = imageIntroUrl;
 
-  const handleFileChange = (file: File | null) => {
-    setImage(file);
+    if (imageCoverFile) {
+      coverUrl = await uploadImageToFirebase(imageCoverFile, "cover");
+    }
+
+    if (imageIntroFile) {
+      introUrl = await uploadImageToFirebase(imageIntroFile, "intro");
+    }
+
     setRestaurantValues((prevValues) => ({
       ...prevValues,
-      file: file,
+      imageCover: coverUrl,
+      imageIntro: introUrl,
     }));
+
+    const updatedValues = {
+      ...restaurantValues,
+      imageCover: coverUrl,
+      imageIntro: introUrl,
+    };
+
+    setRestaurantValues(updatedValues);
+
+    console.log("Before setting state:", updatedValues);
+  };
+
+  const handleCoverImageUpload = (file: File | null) => {
+    if (file) {
+      setImageCoverUrl(URL.createObjectURL(file));
+    } else {
+      setImageCoverUrl("");
+    }
+    setImageCoverFile(file);
+  };
+
+  const handleIntroImageUpload = (file: File | null) => {
+    if (file) {
+      setImageIntroUrl(URL.createObjectURL(file));
+    } else {
+      setImageIntroUrl("");
+    }
+    setImageIntroFile(file);
+  };
+
+  const handleDeleteImage = (type: "cover" | "intro") => {
+    if (type === "cover") {
+      setImageCoverUrl("");
+      setImageCoverFile(null);
+    }
+    if (type === "intro") {
+      setImageIntroUrl("");
+      setImageIntroFile(null);
+    }
   };
 
   return (
@@ -142,8 +195,57 @@ const RestaurantNew = () => {
               required
             />
           </div>
+
           <div className="w-[40%]">
-            <Upload value={image} onChange={handleFileChange} />
+            <div className="flex gap-1">
+              {imageCoverUrl ? (
+                <div className="relative group w-full bg-green-100 h-64 p-3 border-2 border-dotted flex items-center justify-center">
+                  <img
+                    src={imageCoverUrl}
+                    alt="Cover"
+                    className="w-full h-full object-cover transition duration-300 group-hover:brightness-75"
+                  />
+                  <div
+                    className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    onClick={() => handleDeleteImage("cover")}
+                  >
+                    <MdDelete
+                      size={28}
+                      className="text-slate-50 cursor-pointer"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <Upload
+                  value={imageCoverFile}
+                  onChange={handleCoverImageUpload}
+                />
+              )}
+              {imageIntroUrl ? (
+                <div className="relative group w-full bg-green-100 h-64 p-3 border-2 border-dotted flex items-center justify-center">
+                  <img
+                    src={imageIntroUrl}
+                    alt="Intro"
+                    className="w-full h-full object-cover transition duration-300 group-hover:brightness-75"
+                  />
+                  <div
+                    className="absolute inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300"
+                    onClick={() => handleDeleteImage("intro")}
+                  >
+                    <MdDelete
+                      size={28}
+                      className="text-slate-50 cursor-pointer"
+                    />
+                  </div>
+                </div>
+              ) : (
+                <Upload
+                  value={imageIntroFile}
+                  onChange={handleIntroImageUpload}
+                />
+              )}
+            </div>
+
             <div className="mt-3">
               <h1 className="mb-2">Working Days</h1>
               <DropDown

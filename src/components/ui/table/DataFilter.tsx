@@ -1,30 +1,26 @@
-import { ChangeEvent, useState } from "react";
+import { ChangeEvent } from "react";
 import { ITableColumn } from "../../../types/table";
 import DropDown from "../DropDown";
-
 interface IDataFilter {
   columns: ITableColumn[];
+  setSearch: (payload: string) => void;
+  selectedFilterOption: string | string[];
+  setSelectFilterOption: React.Dispatch<
+    React.SetStateAction<string | string[]>
+  >;
 }
 
-const DataFilter = ({ columns }: IDataFilter) => {
-  const [toggleFilter, setToggleFilter] = useState<boolean>(false);
-  const [selectedOption, setSelectedOption] = useState<"Nothing" | string>(
-    "nothing"
-  );
-  const [search, setSearch] = useState<string>("");
-  console.log(search);
-  const handleSelectOption = (option: string) => {
-    setSelectedOption(option);
-    setToggleFilter(!toggleFilter);
-  };
-
-  const handleToggleFilter = () => {
-    setToggleFilter(!toggleFilter);
-  };
-
+const DataFilter = ({
+  columns,
+  setSearch,
+  setSelectFilterOption,
+  selectedFilterOption,
+}: IDataFilter) => {
   const handleSearch = (e: ChangeEvent<HTMLInputElement>) => {
     setSearch(e.target.value);
   };
+
+  const handleChange = () => {};
 
   return (
     <div className="flex gap-2 items-center">
@@ -32,10 +28,10 @@ const DataFilter = ({ columns }: IDataFilter) => {
         <h1>Filter by:</h1>
         <DropDown
           options={columns}
-          handleSelectOption={handleSelectOption}
-          handleToggleDropDown={handleToggleFilter}
-          selectedOption={selectedOption}
-          isDropDownOpen={toggleFilter}
+          onChange={handleChange}
+          selected={selectedFilterOption}
+          setSelected={setSelectFilterOption}
+          multiple={false}
         />
       </div>
 

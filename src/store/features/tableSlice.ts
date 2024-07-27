@@ -7,7 +7,7 @@ type IinitialState = {
 
 const initialState: IinitialState = {
   currentPage: 1,
-  dataPerPage: 5,
+  dataPerPage: 10,
 };
 
 const tableSlice = createSlice({

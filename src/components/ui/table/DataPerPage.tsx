@@ -10,7 +10,7 @@ interface IDataPerPageProps {
 const DataPerPage = ({ dataPerPage }: IDataPerPageProps) => {
   const [collapseManu, setCollapsMenu] = useState<boolean>(false);
 
-  const options = [1, 3, 5];
+  const options = [10, 15, 20];
   const dispatch = useDispatch<AppDispatch>();
 
   const handleChooseOption = (option: number) => {

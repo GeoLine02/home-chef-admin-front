@@ -1,7 +1,7 @@
-import React, { ChangeEvent } from "react";
+import { ChangeEvent } from "react";
 
 interface IUpload {
-  value: File | null;
+  value: string | File | null;
   onChange: (file: File | null) => void;
 }
 

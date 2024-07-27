@@ -6,7 +6,7 @@ import { IoIosArrowUp } from "react-icons/io";
 interface IDropDownProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   options: any[];
-  selected: string[];
+  selected: number[];
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   setSelected: any;
   multiSelect?: boolean;
@@ -24,7 +24,7 @@ const DropDown = ({
     setIsOpen(!isOpen);
   };
 
-  const handleSelect = (value: string) => {
+  const handleSelect = (value: number) => {
     console.log(value);
     if (multiSelect) {
       if (selected.includes(value)) {
@@ -38,7 +38,7 @@ const DropDown = ({
     }
   };
 
-  const handleDelete = (value: string) => {
+  const handleDelete = (value: number) => {
     if (multiSelect && Array.isArray(selected)) {
       setSelected(selected.filter((item) => item !== value));
     }

@@ -12,6 +12,7 @@ import TimeRange from "../../components/ui/TimeRange";
 import { createRestaurantService } from "../../services/restaurants";
 import validationSchema from "./validationSchema";
 import * as Yup from "yup";
+import { MoonLoader } from "react-spinners";
 
 const RestaurantNew = () => {
   const [image, setImage] = useState<File | null>(null);
@@ -19,8 +20,9 @@ const RestaurantNew = () => {
     []
   );
   const [selectedRestaurantTypes, setSelectedRestaurantTypes] = useState<
-    string[]
+    number[]
   >([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [restaurantValues, setRestaurantValues] = useState({
     name: "",
     ownerId: "",
@@ -85,6 +87,7 @@ const RestaurantNew = () => {
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
+    setIsLoading(true);
     try {
       await validationSchema.validate(restaurantValues, { abortEarly: false });
       console.log("form data is valid");
@@ -99,13 +102,17 @@ const RestaurantNew = () => {
       formData.append("email", restaurantValues.email);
       formData.append("workingFrom", restaurantValues.workingFrom);
       formData.append("workingTill", restaurantValues.workingTill);
+      formData.append("phone", restaurantValues.phone);
       if (restaurantValues.file) {
         formData.append("file", restaurantValues.file);
       }
-      formData.append("workingDays", restaurantValues.workingDays.join(","));
+      formData.append(
+        "workingDays",
+        JSON.stringify(restaurantValues.workingDays)
+      );
       formData.append(
         "restaurantTypes",
-        restaurantValues.restaurantTypes.join(",")
+        JSON.stringify(restaurantValues.restaurantTypes)
       );
       const resp = await createRestaurantService(formData);
       return resp?.json();
@@ -119,6 +126,9 @@ const RestaurantNew = () => {
         });
         setError(validationErrors);
       }
+      setIsLoading(false);
+    } finally {
+      setIsLoading(false);
     }
   };
 
@@ -222,9 +232,12 @@ const RestaurantNew = () => {
             <button type="reset" className="rounded-md bg-red-500 px-3 py-1">
               Discard
             </button>
-            <button type="submit" className="rounded-md bg-green-500 px-3 py-1">
-              Submit
-            </button>
+            <div className="flex items-center gap-2 rounded-md bg-green-500 px-3 py-1">
+              <button type="submit">Submit</button>
+              {isLoading && (
+                <MoonLoader color="rgba(0, 128, 0, 1)" speedMultiplier={0.4} />
+              )}
+            </div>
           </div>
         </div>
       </form>

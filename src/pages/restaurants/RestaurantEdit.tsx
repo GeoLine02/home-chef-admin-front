@@ -49,7 +49,7 @@ const RestaurantEdit = () => {
   const restaurantByID = useSelector(
     (state: RootState) => state.restaurantReducer.restaurantById
   );
-  console.log("restaurantByID", restaurantByID);
+  console.log("selectedRestaurantTypes", selectedRestaurantTypes);
   const restaurnatTypes = useSelector(
     (state: RootState) => state.restaurantSettingsReducer.restaurnatTypes
   );
@@ -152,6 +152,7 @@ const RestaurantEdit = () => {
     try {
       const combinedValues = {
         ...restaurantValues,
+        restaurantTypes: selectedRestaurantTypes,
         workingDays: selectedWorkingDays,
       };
 
@@ -172,11 +173,10 @@ const RestaurantEdit = () => {
       if (restaurantValues.file) {
         formData.append("file", restaurantValues.file);
       }
-      console.log("innerLog", selectedWorkingDays);
       formData.append("workingDays", JSON.stringify(selectedWorkingDays));
       formData.append(
         "restaurantTypes",
-        JSON.stringify(restaurantValues.restaurantTypes)
+        JSON.stringify(selectedRestaurantTypes)
       );
       const resp = await updateRestaurantService(
         parseInt(params?.id as string),

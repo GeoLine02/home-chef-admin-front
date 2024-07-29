@@ -22,6 +22,7 @@ const RestaurantNew = () => {
   const [selectedRestaurantTypes, setSelectedRestaurantTypes] = useState<
     number[]
   >([]);
+
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [restaurantValues, setRestaurantValues] = useState({
     name: "",

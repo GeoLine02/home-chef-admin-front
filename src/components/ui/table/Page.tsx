@@ -1,17 +1,15 @@
-import { useDispatch } from "react-redux";
-import { AppDispatch } from "../../../store/store";
-import { setCurrentPageAction } from "../../../store/features/tableSlice";
+import { SetStateAction } from "react";
 
 interface IpageProps {
   totalPages: number;
+  setCurrentPage: React.Dispatch<SetStateAction<number>>;
 }
 
-const Page = ({ totalPages }: IpageProps) => {
+const Page = ({ totalPages, setCurrentPage }: IpageProps) => {
   const pages = Array.from({ length: totalPages }, (_, index) => index + 1);
-  const dispatch = useDispatch<AppDispatch>();
 
   const handlePageChange = (page: number) => {
-    dispatch(setCurrentPageAction(page));
+    setCurrentPage(page);
   };
 
   return (

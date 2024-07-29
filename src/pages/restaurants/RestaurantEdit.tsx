@@ -36,8 +36,6 @@ const RestaurantEdit = () => {
     city: "",
     phone: "",
     file: image,
-    workingDays: selectedWorkingDays,
-    restaurantTypes: selectedRestaurantTypes,
     workingFrom: "",
     workingTill: "",
   });
@@ -51,7 +49,7 @@ const RestaurantEdit = () => {
   const restaurantByID = useSelector(
     (state: RootState) => state.restaurantReducer.restaurantById
   );
-
+  console.log("restaurantByID", restaurantByID);
   const restaurnatTypes = useSelector(
     (state: RootState) => state.restaurantSettingsReducer.restaurnatTypes
   );
@@ -87,8 +85,6 @@ const RestaurantEdit = () => {
         city: restaurantByID.city || "",
         phone: restaurantByID.phone || "",
         file: restaurantByID.img || null,
-        workingDays: restaurantByID?.workingDays || [],
-        restaurantTypes: restaurantByID.restaurantTypes || [],
         workingFrom: restaurantByID.workingFrom || "",
         workingTill: restaurantByID.workingTill || "",
       });
@@ -96,31 +92,41 @@ const RestaurantEdit = () => {
   }, [restaurantByID, params?.id]);
 
   useEffect(() => {
+    if (restaurantByID?.workingDays) {
+      setSelectedWorkingDays([...restaurantByID.workingDays]);
+    }
+  }, [restaurantByID?.workingDays]);
+
+  console.log("selectedWorkingDays", selectedWorkingDays);
+
+  useEffect(() => {
     dispatch(getRestaurntTypes());
     dispatch(getWeekDays());
   }, [dispatch]);
 
-  useMemo(() => {
-    if (restaurantByID) {
+  useEffect(() => {
+    if (restaurantByID && !selectedWorkingDays.length) {
       setSelectedWorkingDays([...restaurantByID.workingDays]);
     }
-  }, [restaurantByID]);
+  }, [restaurantByID, selectedWorkingDays.length]);
 
-  useMemo(() => {
+  useEffect(() => {
     if (restaurantByID) {
       setWorkingFrom(restaurantByID.workingFrom);
       setWorkingTill(restaurantByID.workingTill);
     }
-  }, [restaurantByID]);
+  }, [restaurantByID, params?.id]);
 
-  useMemo(() => {
-    if (restaurantByID) {
+  useEffect(() => {
+    if (restaurantByID && !selectedRestaurantTypes.length) {
       setSelectedRestaurantTypes([...restaurantByID.restaurantTypes]);
     }
-  }, [restaurantByID]);
+  }, [restaurantByID, selectedRestaurantTypes.length, params?.id]);
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
+    console.log("name", name);
+    console.log("value", value);
     setRestaurantValues((prevValues) => ({
       ...prevValues,
       [name]: value,
@@ -144,7 +150,12 @@ const RestaurantEdit = () => {
     setIsLoading(true);
     e.preventDefault();
     try {
-      await validationSchema.validate(restaurantValues, { abortEarly: false });
+      const combinedValues = {
+        ...restaurantValues,
+        workingDays: selectedWorkingDays,
+      };
+
+      await validationSchema.validate(combinedValues, { abortEarly: false });
       console.log("form data is valid");
       const formData = new FormData();
       formData.append("name", restaurantValues.name);
@@ -161,10 +172,8 @@ const RestaurantEdit = () => {
       if (restaurantValues.file) {
         formData.append("file", restaurantValues.file);
       }
-      formData.append(
-        "workingDays",
-        JSON.stringify(restaurantValues.workingDays)
-      );
+      console.log("innerLog", selectedWorkingDays);
+      formData.append("workingDays", JSON.stringify(selectedWorkingDays));
       formData.append(
         "restaurantTypes",
         JSON.stringify(restaurantValues.restaurantTypes)

@@ -25,10 +25,16 @@ const RestaurantNew = () => {
   const [selectRestaurantTypes, setSelectRestaurantTypes] = useState<string[]>(
     []
   );
-
+  const [selectedRestaurantTypes, setSelectedRestaurantTypes] = useState<
+    number[]
+  >([]);
+  const [isLoading, setIsLoading] = useState<boolean>(false);
   const [restaurantValues, setRestaurantValues] = useState({
     name: "",
     ownerId: "",
+    countryId: 201,
+    latitude: 0.4234234,
+    longitude: 0.4234234,
     email: "",
     address: "",
     city: "",
@@ -36,12 +42,13 @@ const RestaurantNew = () => {
     imageCover: imageCoverUrl,
     imageIntro: imageIntroUrl,
     workingDays: selectedWorkingDays,
-    restaurantType: selectRestaurantTypes,
+    restaurantTypes: selectedRestaurantTypes,
+    workingFrom: "",
+    workingTill: "",
   });
-
-  const [startTime, setStartTime] = useState("00:00");
-  const [endTime, setEndTime] = useState("23:59");
-
+  const [workingFrom, setWorkingFrom] = useState("00:00");
+  const [workingTill, setWorkingTill] = useState("23:59");
+  const [error, setError] = useState<Record<string, string | string[]>>({});
   const dispatch = useDispatch<AppDispatch>();
 
   useEffect(() => {
@@ -49,24 +56,30 @@ const RestaurantNew = () => {
     dispatch(getWeekDays());
   }, [dispatch]);
 
+  useEffect(() => {
+    setRestaurantValues({
+      ...restaurantValues,
+      workingDays: selectedWorkingDays,
+      restaurantTypes: selectedRestaurantTypes,
+      workingFrom: workingFrom,
+      workingTill: workingTill,
+    });
+  }, [selectedRestaurantTypes, selectedWorkingDays, workingFrom, workingTill]);
+
   const restaurnatTypes = useSelector(
     (state: RootState) => state.restaurantSettingsReducer.restaurnatTypes
   );
-
   const weekDays = useSelector(
     (state: RootState) => state.restaurantSettingsReducer.days
   );
-
   const daysOptions = weekDays.map((day) => ({
     accessorKey: day.id,
     header: day.days,
   }));
-
   const restaurantTypesOptions = restaurnatTypes.map((type) => ({
     accessorKey: type.id,
     header: type.typeName,
   }));
-
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
     setRestaurantValues((prevValues) => ({
@@ -74,23 +87,9 @@ const RestaurantNew = () => {
       [name]: value,
     }));
   };
-
-  const handleWorkingDaysChange = (selected: string[]) => {
-    setSelectedWorkingDays(selected);
-  };
-
-  const handleRestaurantTypesChange = (selected: string) => {
-    const newState = [...selectRestaurantTypes];
-    if (newState.includes(selected)) {
-      return alert(`this day is alredy exist ${selected}`);
-    }
-    newState.push(selected);
-    setSelectRestaurantTypes(newState);
-  };
-
   const onTimeRangeChange = (start: string, end: string) => {
-    setStartTime(start);
-    setEndTime(end);
+    setWorkingFrom(start);
+    setWorkingTill(end);
   };
 
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
@@ -164,36 +163,43 @@ const RestaurantNew = () => {
               value={restaurantValues.name}
               required
             />
+            {error.name && <p>{error.name}</p>}
             <Input
               name="ownerId"
               onChange={handleChange}
               value={restaurantValues.ownerId}
               required
             />
+            {error.ownerId && <p>{error.ownerId}</p>}
+
             <Input
               name="email"
               onChange={handleChange}
               value={restaurantValues.email}
               required
             />
+            {error.email && <p>{error.email}</p>}
             <Input
               name="address"
               onChange={handleChange}
               value={restaurantValues.address}
               required
             />
+            {error.address && <p>{error.address}</p>}
             <Input
               name="city"
               onChange={handleChange}
               value={restaurantValues.city}
               required
             />
+            {error.city && <p>{error.city}</p>}
             <Input
               name="phone"
               onChange={handleChange}
               value={restaurantValues.phone}
               required
             />
+            {error.phone && <p>{error.phone}</p>}
           </div>
 
           <div className="w-[40%]">
@@ -249,32 +255,34 @@ const RestaurantNew = () => {
             <div className="mt-3">
               <h1 className="mb-2">Working Days</h1>
               <DropDown
-                handleWorkingDaysChange={handleWorkingDaysChange}
                 options={daysOptions}
-                multiple={true}
+                multiSelect={true}
                 selected={selectedWorkingDays}
                 setSelected={setSelectedWorkingDays}
-                name="workingDays"
               />
+              {error.workingDays && <p>{error.workingDays}</p>}
             </div>
             <div className="mt-3">
               <h1 className="mb-2">Restaurant Type</h1>
               <DropDown
-                handleWorkingDaysChange={handleRestaurantTypesChange}
                 options={restaurantTypesOptions}
-                selected={selectRestaurantTypes}
-                setSelected={setSelectRestaurantTypes}
-                multiple
-                name="restaurantType"
+                selected={selectedRestaurantTypes}
+                setSelected={setSelectedRestaurantTypes}
+                multiSelect
               />
+              {error.restaurantTypes && <p>{error.restaurantTypes}</p>}
             </div>
             <div className="mt-3">
               <h1 className="mt-2">Working Hours</h1>
               <TimeRange
+                minTime={workingFrom}
+                maxTime={workingTill}
                 startTimeHeader="Working from"
                 endTimeHeader="Working till"
                 onChange={onTimeRangeChange}
               />
+              {error.workingFrom && <p>{error.workingFrom}</p>}
+              {error.workingTill && <p>{error.workingTill}</p>}
             </div>
           </div>
         </div>
@@ -283,9 +291,12 @@ const RestaurantNew = () => {
             <button type="reset" className="rounded-md bg-red-500 px-3 py-1">
               Discard
             </button>
-            <button type="submit" className="rounded-md bg-green-500 px-3 py-1">
-              Submit
-            </button>
+            <div className="flex items-center gap-2 rounded-md bg-green-500 px-3 py-1">
+              <button type="submit">Submit</button>
+              {isLoading && (
+                <MoonLoader color="rgba(0, 128, 0, 1)" speedMultiplier={0.4} />
+              )}
+            </div>
           </div>
         </div>
       </form>

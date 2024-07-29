@@ -25,6 +25,56 @@ export const restaurantListService = async ({
   }
 };
 
+export const getRestaurantByIdService = async (id: number) => {
+  try {
+    const apiCallOptions = {
+      header: {
+        "Content-Type": "applictaion/json",
+      },
+      method: "GET",
+    };
+    const resp = await http(`/restaurant/${id}`, apiCallOptions);
+    return resp.json();
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// create restaurant
+export const createRestaurantService = async (restaurantData: FormData) => {
+  try {
+    const apiCallOptions = {
+      method: "POST",
+      body: restaurantData,
+    };
+    const resp = await http("/restaurant/create", apiCallOptions);
+    return resp;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
+// update restaurant by id
+export const updateRestaurantService = async (
+  restaurantId: number,
+  formData: FormData
+) => {
+  try {
+    const apiCallOptions = {
+      method: "PATCH",
+      body: formData,
+    };
+    console.log("@@@@@@@@@formdata", formData);
+    const resp = await http(
+      `/restaurant/update/${restaurantId}`,
+      apiCallOptions
+    );
+    return resp;
+  } catch (error) {
+    console.log(error);
+  }
+};
+
 // delete restaurant
 export const restaurantDeleteService = async (id: string) => {
   try {

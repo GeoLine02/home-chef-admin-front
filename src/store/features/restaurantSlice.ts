@@ -1,13 +1,16 @@
 import { AsyncThunk, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ITableData } from "../../types/table";
 import {
+  getRestaurantByIdService,
   restaurantDeleteService,
   restaurantListService,
 } from "../../services/restaurants";
+import { IRestaurnatById } from "../../types/restaurant";
 
 type InitialStateType = {
   restaurantList: ITableData | null;
   toggleConfirmationModal: boolean;
+  restaurantById: null | IRestaurnatById;
   search: string;
   isDataFetching: boolean;
   selectRestaurantID: string | null;
@@ -23,6 +26,7 @@ export interface IRestaurantListPayloadCreator {
 
 const initialState: InitialStateType = {
   restaurantList: null,
+  restaurantById: null,
   toggleConfirmationModal: false,
   selectRestaurantID: null,
   search: "",
@@ -51,6 +55,16 @@ export const fetchRestaurantList: AsyncThunk<
     }
   }
 );
+
+export const fetchRestaurantByID: AsyncThunk<IRestaurnatById, number, object> =
+  createAsyncThunk("restaurants/id", async (id: number) => {
+    try {
+      const resp = await getRestaurantByIdService(id);
+      return resp;
+    } catch (error) {
+      console.log(error);
+    }
+  });
 
 export const deleteRestaurant: AsyncThunk<object, string, object> =
   createAsyncThunk("restaurant/delete", async (id: string) => {
@@ -111,6 +125,21 @@ const restaurantSlice = createSlice({
         }
       })
       .addCase(deleteRestaurant.rejected, (state, action) => {
+        state.status = "rejected";
+        state.isDataFetching = false;
+        state.error = action.error;
+      })
+      // restaurant by id
+      .addCase(fetchRestaurantByID.pending, (state) => {
+        state.status = "pending";
+        state.isDataFetching = true;
+      })
+      .addCase(fetchRestaurantByID.fulfilled, (state, action) => {
+        state.status = "successful";
+        state.isDataFetching = false;
+        state.restaurantById = action.payload;
+      })
+      .addCase(fetchRestaurantByID.rejected, (state, action) => {
         state.status = "rejected";
         state.isDataFetching = false;
         state.error = action.error;

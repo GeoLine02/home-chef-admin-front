@@ -13,9 +13,11 @@ import { ITableAction, ITableData } from "../../types/table";
 import { BsPencil } from "react-icons/bs";
 import { FaTrashAlt } from "react-icons/fa";
 import ConfirmationModal from "../../components/shared/ConfirmationModal";
+import { useNavigate } from "react-router-dom";
 
 const RestaurantList = () => {
   const dispatch = useDispatch<AppDispatch>();
+  const navigate = useNavigate();
   const [page, setCurrentPage] = useState(1);
   const [selectedOption, setSelectedOption] = useState<string | string[]>(
     "" || []
@@ -68,7 +70,9 @@ const RestaurantList = () => {
     {
       name: "edit",
       icon: <BsPencil size={16} />,
-      handler: (id: string) => console.log(`Edit ${id}`),
+      handler: (id: string) => {
+        navigate(`/restaurants/update/${id}`);
+      },
     },
     {
       name: "delete",

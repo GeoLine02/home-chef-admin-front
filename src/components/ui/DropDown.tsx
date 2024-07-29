@@ -1,4 +1,4 @@
-import { useEffect, useState } from "react";
+import { useState } from "react";
 import { TiDelete } from "react-icons/ti";
 import { IoIosArrowDown } from "react-icons/io";
 import { IoIosArrowUp } from "react-icons/io";
@@ -6,17 +6,15 @@ import { IoIosArrowUp } from "react-icons/io";
 interface IDropDownProps {
   // eslint-disable-next-line @typescript-eslint/no-explicit-any
   options: any[];
-  selected: string[];
-  setSelected: React.Dispatch<React.SetStateAction<string[]>>;
-  multiple?: boolean;
-  handleWorkingDaysChange: (selected: string) => void;
-  name: string;
+  selected: number[];
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
+  setSelected: any;
+  multiSelect?: boolean;
 }
 
 const DropDown = ({
   options,
-  multiple = false,
-  handleWorkingDaysChange,
+  multiSelect = false,
   selected,
   setSelected,
 }: IDropDownProps) => {
@@ -26,33 +24,22 @@ const DropDown = ({
     setIsOpen(!isOpen);
   };
 
-  /*   const handleSelect = (value: any) => {
-    console.log(multiple);
-    if (multiple) {
-      console.log("selected", selected);
-      setSelected((prevSelected) => {
-        const newSelected = Array.isArray(prevSelected)
-          ? [...prevSelected]
-          : [];
-        if (newSelected.includes(value)) {
-          return newSelected.filter((item) => item !== value);
-        } else {
-          return [...newSelected, value];
-        }
-      });
+  const handleSelect = (value: number) => {
+    console.log(value);
+    if (multiSelect) {
+      if (selected.includes(value)) {
+        setSelected(selected.filter((item) => item !== value));
+      } else {
+        setSelected([...selected, value]);
+      }
     } else {
       setSelected(value);
-    }
-  }; */
-  const handleSelect = (value: any) => {
-    console.log(value);
-    if (multiple) {
-      setSelected(value);
+      setIsOpen(false);
     }
   };
 
-  const handleDelete = (value: string) => {
-    if (multiple && Array.isArray(selected)) {
+  const handleDelete = (value: number) => {
+    if (multiSelect && Array.isArray(selected)) {
       setSelected(selected.filter((item) => item !== value));
     }
   };
@@ -60,7 +47,7 @@ const DropDown = ({
   return (
     <div className="relative">
       <div className="border-2 border-border_color bg-dark_backgorund_color text-black rounded-md p-2 flex items-center justify-between">
-        {multiple && Array.isArray(selected) && (
+        {multiSelect && Array.isArray(selected) && (
           <div className="flex items-center flex-wrap">
             <h3 className="font-medium whitespace-nowrap">Selected Items:</h3>
             {selected.map((item) => {
@@ -79,7 +66,7 @@ const DropDown = ({
             })}
           </div>
         )}
-        {!multiple && (
+        {!multiSelect && (
           <div>
             <h3>{selected}</h3>
           </div>
@@ -95,7 +82,7 @@ const DropDown = ({
             <div className="flex gap-1 w-full pb-2" key={item.accessorKey}>
               <input
                 className="px-2 py-1 bg-light_background_color text-black"
-                type={multiple ? "checkbox" : "radio"}
+                type={multiSelect ? "checkbox" : "radio"}
                 id={item.accessorKey}
                 value={item.accessorKey}
                 checked={
@@ -103,9 +90,9 @@ const DropDown = ({
                     ? selected.includes(item.accessorKey)
                     : selected === item.accessorKey
                 }
+                required
                 onChange={() => {
-                  handleSelect(item.accessorKey),
-                    handleWorkingDaysChange(selected);
+                  handleSelect(item.accessorKey);
                 }}
               />
               <label className="text-black" htmlFor={item.accessorKey}>

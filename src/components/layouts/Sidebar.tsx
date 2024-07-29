@@ -9,16 +9,16 @@ const NavList = styled.ul`
   flex-direction: column;
   align-items: space-between;
   gap: 1rem;
-  padding: 0 3.4rem;
+  padding: 0 2rem;
 `;
 
 const StyledNavLink = styled(NavLink)`
   display: flex;
   width: 80%;
   margin: 0 auto;
-  margin-top: 1rem;
-  padding: 0.8rem 2rem;
-  border-radius: 4rem;
+  margin-top: 0.8rem;
+  padding: 0.5rem 1.5rem;
+  border-radius: 2.4rem;
   background-color: var(--color-green-100);
 
   &:active,
@@ -32,7 +32,7 @@ const StyledNavLink = styled(NavLink)`
 
 const Logo = styled.div`
   align-self: center;
-  width: 7rem;
+  width: 4rem;
 
   & img {
     width: 100%;

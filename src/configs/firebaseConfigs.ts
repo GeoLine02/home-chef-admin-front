@@ -2,7 +2,7 @@ import { initializeApp } from "firebase/app";
 import { getStorage, ref, uploadBytes, getDownloadURL } from "firebase/storage";
 
 const firebaseConfig = {
-  apiKey: "AIzaSyBd8vNOBNdhlHtszZjD0goO7eCiuyDcxXo",
+  apiKey: import.meta.env.VITE_API_FIREBASE_KEY,
   authDomain: "home-chef-dcd47.firebaseapp.com",
   projectId: "home-chef-dcd47",
   storageBucket: "home-chef-dcd47.appspot.com",

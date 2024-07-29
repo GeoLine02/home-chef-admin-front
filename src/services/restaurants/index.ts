@@ -64,6 +64,7 @@ export const updateRestaurantService = async (
       method: "PATCH",
       body: formData,
     };
+    console.log("@@@@@@@@@formdata", formData);
     const resp = await http(
       `/restaurant/update/${restaurantId}`,
       apiCallOptions

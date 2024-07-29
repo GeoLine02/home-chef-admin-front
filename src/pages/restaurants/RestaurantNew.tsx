@@ -1,11 +1,8 @@
-import { ChangeEvent, FormEvent, useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import * as Yup from "yup";
-import { MoonLoader } from "react-spinners";
-
 import Input from "../../components/ui/Input";
 import Upload from "../../components/ui/Upload";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import DropDown from "../../components/ui/DropDown";
+import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store";
 import {
   getRestaurntTypes,
@@ -13,11 +10,13 @@ import {
 } from "../../store/features/restaurantSettingsSlice";
 import TimeRange from "../../components/ui/TimeRange";
 import { createRestaurantService } from "../../services/restaurants";
-import validationSchema from "../restaurants/validationSchema";
+import validationSchema from "./validationSchema";
+import * as Yup from "yup";
+import { MoonLoader } from "react-spinners";
 
-const ProductCreate = () => {
+const RestaurantNew = () => {
   const [image, setImage] = useState<File | null>(null);
-  const [selectedWoracekingDays, setSelectedWorkingDays] = useState<[] | any[]>(
+  const [selectedWorkingDays, setSelectedWorkingDays] = useState<[] | any[]>(
     []
   );
   const [selectedRestaurantTypes, setSelectedRestaurantTypes] = useState<
@@ -25,7 +24,7 @@ const ProductCreate = () => {
   >([]);
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [restaurantValues, setRestaurantValues] = useState({
-    restaurantID: "",
+    name: "",
     ownerId: "",
     countryId: 201,
     latitude: 0.4234234,
@@ -246,4 +245,4 @@ const ProductCreate = () => {
   );
 };
 
-export default ProductCreate;
+export default RestaurantNew;

@@ -1,23 +1,24 @@
 import { AsyncThunk, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ITableData } from "../../types/table";
+
+import { IProductById } from "../../types/product";
 import {
-  getRestaurantByIdService,
-  restaurantDeleteService,
-  restaurantListService,
-} from "../../services/restaurants";
-import { IRestaurnatById } from "../../types/restaurant";
+  getProductByIdService,
+  productDeleteService,
+  productListService,
+} from "../../services/products";
 
 type InitialStateType = {
-  restaurantList: ITableData | null;
+  productList: ITableData | null;
   toggleConfirmationModal: boolean;
-  restaurantById: null | IRestaurnatById;
+  productById: null | IProductById;
   search: string;
   isDataFetching: boolean;
-  selectRestaurantID: string | null;
+  selectProductId: string | null;
   status: "idle" | "pending" | "successful" | "rejected";
   error: unknown | null;
 };
-export interface IRestaurantListPayloadCreator {
+export interface IProductListPayloadCreator {
   page: number;
   limit: number;
   filterBy: string | string[];
@@ -25,30 +26,31 @@ export interface IRestaurantListPayloadCreator {
 }
 
 const initialState: InitialStateType = {
-  restaurantList: null,
-  restaurantById: null,
+  productList: null,
+  productById: null,
   toggleConfirmationModal: false,
-  selectRestaurantID: null,
+  selectProductId: null,
   search: "",
   isDataFetching: false,
   status: "idle",
   error: null,
 };
 
-export const fetchRestaurantList: AsyncThunk<
+export const fetchProductList: AsyncThunk<
   ITableData,
-  IRestaurantListPayloadCreator,
+  IProductListPayloadCreator,
   object
 > = createAsyncThunk(
-  "restaurants/list",
-  async ({ page, limit, filterBy, search }: IRestaurantListPayloadCreator) => {
+  "products/list",
+  async ({ page, limit, filterBy, search }: IProductListPayloadCreator) => {
     try {
-      const resp = await restaurantListService({
+      const resp = await productListService({
         page,
         limit,
         filterBy,
         search,
       });
+      console.log(resp);
       return resp;
     } catch (error) {
       console.log(error);
@@ -56,28 +58,28 @@ export const fetchRestaurantList: AsyncThunk<
   }
 );
 
-export const fetchRestaurantByID: AsyncThunk<IRestaurnatById, number, object> =
-  createAsyncThunk("restaurants/id", async (id: number) => {
+export const fetchProductByID: AsyncThunk<IProductById, number, object> =
+  createAsyncThunk("products/id", async (id: number) => {
     try {
-      const resp = await getRestaurantByIdService(id);
+      const resp = await getProductByIdService(id);
       return resp;
     } catch (error) {
       console.log(error);
     }
   });
 
-export const deleteRestaurant: AsyncThunk<object, string, object> =
+export const deleteProduct: AsyncThunk<object, string, object> =
   createAsyncThunk("restaurant/delete", async (id: string) => {
     try {
-      const resp = await restaurantDeleteService(id);
+      const resp = await productDeleteService(id);
       return resp;
     } catch (error) {
       console.log(error);
     }
   });
 
-const restaurantSlice = createSlice({
-  name: "restaurant",
+const productSlice = createSlice({
+  name: "product",
   initialState,
   reducers: {
     // setSelectedOption: (state, action) => {
@@ -89,57 +91,57 @@ const restaurantSlice = createSlice({
     toggleConfirmationModal: (state) => {
       state.toggleConfirmationModal = !state.toggleConfirmationModal;
     },
-    selectRestaurantID: (state, action) => {
-      state.selectRestaurantID = action.payload;
+    selectProductId: (state, action) => {
+      state.selectProductId = action.payload;
     },
   },
   extraReducers: (builder) => {
     // restaurant list
     builder
-      .addCase(fetchRestaurantList.pending, (state) => {
+      .addCase(fetchProductList.pending, (state) => {
         state.status = "pending";
         state.isDataFetching = true;
       })
-      .addCase(fetchRestaurantList.fulfilled, (state, action) => {
+      .addCase(fetchProductList.fulfilled, (state, action) => {
         state.status = "successful";
         state.isDataFetching = false;
-        state.restaurantList = action.payload;
+        state.productList = action.payload;
       })
-      .addCase(fetchRestaurantList.rejected, (state, action) => {
+      .addCase(fetchProductList.rejected, (state, action) => {
         state.status = "rejected";
         state.isDataFetching = false;
         state.error = action.error;
       })
       // restaurant delete
-      .addCase(deleteRestaurant.pending, (state) => {
+      .addCase(deleteProduct.pending, (state) => {
         state.status = "pending";
         state.isDataFetching = true;
       })
-      .addCase(deleteRestaurant.fulfilled, (state) => {
-        if (state.restaurantList) {
-          state.restaurantList.data = state.restaurantList.data.filter(
-            (item) => item.id !== state.selectRestaurantID
+      .addCase(deleteProduct.fulfilled, (state) => {
+        if (state.productList) {
+          state.productList.data = state.productList.data.filter(
+            (item) => item.id !== state.selectProductId
           );
           state.status = "successful";
           state.isDataFetching = false;
         }
       })
-      .addCase(deleteRestaurant.rejected, (state, action) => {
+      .addCase(deleteProduct.rejected, (state, action) => {
         state.status = "rejected";
         state.isDataFetching = false;
         state.error = action.error;
       })
       // restaurant by id
-      .addCase(fetchRestaurantByID.pending, (state) => {
+      .addCase(fetchProductByID.pending, (state) => {
         state.status = "pending";
         state.isDataFetching = true;
       })
-      .addCase(fetchRestaurantByID.fulfilled, (state, action) => {
+      .addCase(fetchProductByID.fulfilled, (state, action) => {
         state.status = "successful";
         state.isDataFetching = false;
-        state.restaurantById = action.payload;
+        state.productById = action.payload;
       })
-      .addCase(fetchRestaurantByID.rejected, (state, action) => {
+      .addCase(fetchProductByID.rejected, (state, action) => {
         state.status = "rejected";
         state.isDataFetching = false;
         state.error = action.error;
@@ -151,6 +153,6 @@ export const {
   // setSelectedOption,
   setSearch,
   toggleConfirmationModal,
-  selectRestaurantID,
-} = restaurantSlice.actions;
-export default restaurantSlice.reducer;
+  selectProductId,
+} = productSlice.actions;
+export default productSlice.reducer;

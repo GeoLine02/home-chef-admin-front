@@ -10,7 +10,8 @@ const validationSchema = Yup.object().shape({
     .required("Email is required"),
   address: Yup.string().required("Address is required"),
   phone: Yup.string().required("Phone number is required"),
-  file: Yup.mixed().required("restaurant photo is required"),
+  // coverImage: Yup.string().required("restaurant cover image is required"),
+  // introImage: Yup.string().required("restaurant intro image is required"),
   workingDays: Yup.array()
     .of(
       Yup.number()

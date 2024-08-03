@@ -1,11 +1,14 @@
 import { ChangeEvent } from "react";
+import { MdDelete } from "react-icons/md";
 
 interface IUpload {
+  name: string;
   value: string | File | null;
   onChange: (file: File | null) => void;
+  handleDelete: () => void;
 }
 
-const Upload = ({ value, onChange }: IUpload) => {
+const Upload = ({ value, onChange, handleDelete, name }: IUpload) => {
   const onFileChange = (e: ChangeEvent<HTMLInputElement>) => {
     if (e.target.files && e.target.files[0]) {
       onChange(e.target.files[0]);
@@ -14,12 +17,34 @@ const Upload = ({ value, onChange }: IUpload) => {
     }
   };
 
+  if (value) {
+    return (
+      <div className="relative group w-full bg-green-100 h-64 p-3 border-2 border-dotted flex items-center justify-center">
+        <img
+          src={value as string}
+          alt={`${name}`}
+          className="w-full h-full object-cover transition duration-300 group-hover:brightness-75"
+        />
+
+        <div className="absolute text-slate-50 inset-0 flex items-center justify-center opacity-0 group-hover:opacity-100 transition-opacity duration-300">
+          <p className="">{name}</p>
+          <MdDelete
+            size={28}
+            className="cursor-pointer"
+            onClick={handleDelete}
+          />
+        </div>
+      </div>
+    );
+  }
+
   return (
     <div className="flex items-center justify-center w-full">
       <label
-        htmlFor="dropzone-file"
+        htmlFor={name}
         className="flex flex-col items-center justify-center w-full h-64 border-2 border-gray-300 border-dashed rounded-lg cursor-pointer bg-gray-50 dark:hover:bg-green-800 dark:bg-dark_backgorund_color hover:bg-gray-100 dark:border-border_color dark:hover:border-border_color"
       >
+        <p>{name}</p>
         <div className="flex flex-col items-center justify-center pt-5 pb-6">
           <svg
             className="w-8 h-8 mb-4 text-gray-500 dark:text-gray-400"
@@ -45,7 +70,7 @@ const Upload = ({ value, onChange }: IUpload) => {
           </p>
         </div>
         <input
-          id="dropzone-file"
+          id={name}
           type="file"
           className="hidden"
           onChange={onFileChange}

@@ -13,9 +13,14 @@ import { createRestaurantService } from "../../services/restaurants";
 import validationSchema from "./validationSchema";
 import * as Yup from "yup";
 import { MoonLoader } from "react-spinners";
+import { uploadImageToFirebase } from "../../services/firebaseApi";
 
 const RestaurantNew = () => {
-  const [image, setImage] = useState<File | null>(null);
+  const [imageCoverFile, setImageCoverFile] = useState<File | null>(null);
+  const [imageIntroFile, setImageIntroFile] = useState<File | null>(null);
+  const [imageCoverUrl, setImageCoverUrl] = useState<string>("");
+  const [imageIntroUrl, setImageIntroUrl] = useState<string>("");
+
   const [selectedWorkingDays, setSelectedWorkingDays] = useState<[] | any[]>(
     []
   );
@@ -34,7 +39,8 @@ const RestaurantNew = () => {
     address: "",
     city: "",
     phone: "",
-    file: image,
+    imageCover: imageCoverUrl,
+    imageIntro: imageIntroUrl,
     workingDays: selectedWorkingDays,
     restaurantTypes: selectedRestaurantTypes,
     workingFrom: "",
@@ -89,6 +95,32 @@ const RestaurantNew = () => {
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
+    let coverUrl = imageCoverUrl;
+    let introUrl = imageIntroUrl;
+
+    if (imageCoverFile) {
+      coverUrl = await uploadImageToFirebase(imageCoverFile, "cover");
+    }
+
+    if (imageIntroFile) {
+      introUrl = await uploadImageToFirebase(imageIntroFile, "intro");
+    }
+
+    setRestaurantValues((prevValues) => ({
+      ...prevValues,
+      imageCover: coverUrl,
+      imageIntro: introUrl,
+    }));
+
+    const updatedValues = {
+      ...restaurantValues,
+      imageCover: coverUrl,
+      imageIntro: introUrl,
+    };
+
+    setRestaurantValues(updatedValues);
+
+    console.log("Before setting state:", updatedValues);
     try {
       await validationSchema.validate(restaurantValues, { abortEarly: false });
       console.log("form data is valid");
@@ -104,8 +136,11 @@ const RestaurantNew = () => {
       formData.append("workingFrom", restaurantValues.workingFrom);
       formData.append("workingTill", restaurantValues.workingTill);
       formData.append("phone", restaurantValues.phone);
-      if (restaurantValues.file) {
-        formData.append("file", restaurantValues.file);
+      console.log("before images");
+      if (restaurantValues.imageCover && restaurantValues.imageIntro) {
+        console.log("if");
+        formData.append("coverImage", restaurantValues.imageCover);
+        formData.append("introImage", restaurantValues.imageIntro);
       }
       formData.append(
         "workingDays",
@@ -133,12 +168,33 @@ const RestaurantNew = () => {
     }
   };
 
-  const handleFileChange = (file: File | null) => {
-    setImage(file);
-    setRestaurantValues((prevValues) => ({
-      ...prevValues,
-      file: file,
-    }));
+  const handleCoverImageUpload = (file: File | null) => {
+    if (file) {
+      setImageCoverUrl(URL.createObjectURL(file));
+    } else {
+      setImageCoverUrl("");
+    }
+    setImageCoverFile(file);
+  };
+
+  const handleIntroImageUpload = (file: File | null) => {
+    if (file) {
+      setImageIntroUrl(URL.createObjectURL(file));
+    } else {
+      setImageIntroUrl("");
+    }
+    setImageIntroFile(file);
+  };
+
+  const handleDeleteImage = (type: "cover" | "intro") => {
+    if (type === "cover") {
+      setImageCoverUrl("");
+      setImageCoverFile(null);
+    }
+    if (type === "intro") {
+      setImageIntroUrl("");
+      setImageIntroFile(null);
+    }
   };
 
   return (
@@ -192,8 +248,21 @@ const RestaurantNew = () => {
             {error.phone && <p>{error.phone}</p>}
           </div>
           <div className="w-[40%]">
-            <Upload value={image} onChange={handleFileChange} />
-            {error.file && <p>{error.file}</p>}
+            <div className="flex gap-1">
+              <Upload
+                name="cover"
+                value={imageCoverUrl}
+                onChange={handleCoverImageUpload}
+                handleDelete={() => handleDeleteImage("cover")}
+              />
+              <Upload
+                name="intro"
+                value={imageIntroUrl}
+                onChange={handleIntroImageUpload}
+                handleDelete={() => handleDeleteImage("intro")}
+              />
+            </div>
+
             <div className="mt-3">
               <h1 className="mb-2">Working Days</h1>
               <DropDown

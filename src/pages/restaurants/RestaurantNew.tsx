@@ -95,61 +95,55 @@ const RestaurantNew = () => {
   const onSubmit = async (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
     setIsLoading(true);
-    let coverUrl = imageCoverUrl;
-    let introUrl = imageIntroUrl;
 
-    if (imageCoverFile) {
-      coverUrl = await uploadImageToFirebase(imageCoverFile, "cover");
-    }
-
-    if (imageIntroFile) {
-      introUrl = await uploadImageToFirebase(imageIntroFile, "intro");
-    }
-
-    setRestaurantValues((prevValues) => ({
-      ...prevValues,
-      imageCover: coverUrl,
-      imageIntro: introUrl,
-    }));
-
-    const updatedValues = {
-      ...restaurantValues,
-      imageCover: coverUrl,
-      imageIntro: introUrl,
-    };
-
-    setRestaurantValues(updatedValues);
-
-    console.log("Before setting state:", updatedValues);
     try {
-      await validationSchema.validate(restaurantValues, { abortEarly: false });
-      console.log("form data is valid");
-      const formData = new FormData();
-      formData.append("name", restaurantValues.name);
-      formData.append("address", restaurantValues.address);
-      formData.append("city", restaurantValues.city);
-      formData.append("countryId", restaurantValues.countryId.toString());
-      formData.append("latitude", restaurantValues.latitude.toString());
-      formData.append("longitude", restaurantValues.longitude.toString());
-      formData.append("ownerId", restaurantValues.ownerId.toString());
-      formData.append("email", restaurantValues.email);
-      formData.append("workingFrom", restaurantValues.workingFrom);
-      formData.append("workingTill", restaurantValues.workingTill);
-      formData.append("phone", restaurantValues.phone);
-      console.log("before images");
-      if (restaurantValues.imageCover && restaurantValues.imageIntro) {
-        console.log("if");
-        formData.append("coverImage", restaurantValues.imageCover);
-        formData.append("introImage", restaurantValues.imageIntro);
+      let coverUrl = imageCoverUrl;
+      let introUrl = imageIntroUrl;
+
+      if (imageCoverFile) {
+        coverUrl = await uploadImageToFirebase(imageCoverFile, "cover");
       }
-      formData.append(
-        "workingDays",
-        JSON.stringify(restaurantValues.workingDays)
-      );
+
+      if (imageIntroFile) {
+        introUrl = await uploadImageToFirebase(imageIntroFile, "intro");
+      }
+
+      const updatedValues = {
+        ...restaurantValues,
+        imageCover: coverUrl,
+        imageIntro: introUrl,
+      };
+
+      console.log("Before setting state:", updatedValues);
+
+      await validationSchema.validate(updatedValues, { abortEarly: false });
+      console.log("Form data is valid");
+
+      const formData = new FormData();
+      formData.append("name", updatedValues.name);
+      formData.append("address", updatedValues.address);
+      formData.append("city", updatedValues.city);
+      formData.append("countryId", updatedValues.countryId.toString());
+      formData.append("latitude", updatedValues.latitude.toString());
+      formData.append("longitude", updatedValues.longitude.toString());
+      formData.append("ownerId", updatedValues.ownerId.toString());
+      formData.append("email", updatedValues.email);
+      formData.append("workingFrom", updatedValues.workingFrom);
+      formData.append("workingTill", updatedValues.workingTill);
+      formData.append("phone", updatedValues.phone);
+
+      if (updatedValues.imageCover && updatedValues.imageIntro) {
+        console.log("Appending images");
+        formData.append("coverImage", updatedValues.imageCover);
+        formData.append("introImage", updatedValues.imageIntro);
+      }
+
+      formData.append("workingDays", JSON.stringify(updatedValues.workingDays));
       formData.append(
         "restaurantTypes",
-        JSON.stringify(restaurantValues.restaurantTypes)
+        JSON.stringify(updatedValues.restaurantTypes)
       );
+
       const resp = await createRestaurantService(formData);
       return resp?.json();
     } catch (error) {
@@ -157,7 +151,7 @@ const RestaurantNew = () => {
         const validationErrors: Record<string, string | string[]> = {};
         error.inner.forEach((err) => {
           if (err.path) {
-            validationErrors[err.path] = error.message;
+            validationErrors[err.path] = err.message;
           }
         });
         setError(validationErrors);
@@ -305,7 +299,11 @@ const RestaurantNew = () => {
             <div className="flex items-center gap-2 rounded-md bg-green-500 px-3 py-1">
               <button type="submit">Submit</button>
               {isLoading && (
-                <MoonLoader color="rgba(0, 128, 0, 1)" speedMultiplier={0.4} />
+                <MoonLoader
+                  color="rgba(0, 128, 0, 1)"
+                  size={22}
+                  speedMultiplier={0.4}
+                />
               )}
             </div>
           </div>

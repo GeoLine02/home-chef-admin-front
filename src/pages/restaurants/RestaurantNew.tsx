@@ -128,16 +128,9 @@ const RestaurantNew = () => {
         imageIntro: introUrl,
       };
 
-      console.log("Before setting state:", updatedValues);
-
-      await validationSchema.validate(updatedValues, { abortEarly: false });
-      console.log("Form data is valid");
-
-
-    try {
       await validationSchema.validate(restaurantValues, { abortEarly: false });
       console.log("form data is valid");
-      
+
       const formData = new FormData();
       formData.append("name", updatedValues.name);
       formData.append("address", updatedValues.address);
@@ -219,35 +212,30 @@ const RestaurantNew = () => {
               name="name"
               onChange={handleChange}
               value={restaurantValues.name}
-              required
             />
             {error.name && <p>{error.name}</p>}
             <Input
               name="email"
               onChange={handleChange}
               value={restaurantValues.email}
-              required
             />
             {error.email && <p>{error.email}</p>}
             <Input
               name="address"
               onChange={handleChange}
               value={restaurantValues.address}
-              required
             />
             {error.address && <p>{error.address}</p>}
             <Input
               name="city"
               onChange={handleChange}
               value={restaurantValues.city}
-              required
             />
             {error.city && <p>{error.city}</p>}
             <Input
               name="phone"
               onChange={handleChange}
               value={restaurantValues.phone}
-              required
             />
             {error.phone && <p>{error.phone}</p>}
           </div>

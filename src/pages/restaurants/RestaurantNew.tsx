@@ -14,6 +14,8 @@ import validationSchema from "./validationSchema";
 import * as Yup from "yup";
 import { MoonLoader } from "react-spinners";
 import { uploadImageToFirebase } from "../../services/firebaseApi";
+import { useLocation } from "react-router-dom";
+import { toast, ToastContainer } from "react-toastify";
 
 const RestaurantNew = () => {
   const [imageCoverFile, setImageCoverFile] = useState<File | null>(null);
@@ -49,12 +51,24 @@ const RestaurantNew = () => {
   const [workingFrom, setWorkingFrom] = useState("00:00");
   const [workingTill, setWorkingTill] = useState("23:59");
   const [error, setError] = useState<Record<string, string | string[]>>({});
+  const location = useLocation();
   const dispatch = useDispatch<AppDispatch>();
-
   useEffect(() => {
     dispatch(getRestaurntTypes());
     dispatch(getWeekDays());
   }, [dispatch]);
+
+  useEffect(() => {
+    const { state } = location;
+    if (state && state.ownerID) {
+      const userCreationToast = () => toast("User created successfuly!");
+      userCreationToast();
+      setRestaurantValues({
+        ...restaurantValues,
+        ownerId: state.ownerID,
+      });
+    }
+  }, [location, restaurantValues.ownerId]);
 
   useEffect(() => {
     setRestaurantValues({
@@ -120,7 +134,6 @@ const RestaurantNew = () => {
 
     setRestaurantValues(updatedValues);
 
-    console.log("Before setting state:", updatedValues);
     try {
       await validationSchema.validate(restaurantValues, { abortEarly: false });
       console.log("form data is valid");
@@ -136,9 +149,7 @@ const RestaurantNew = () => {
       formData.append("workingFrom", restaurantValues.workingFrom);
       formData.append("workingTill", restaurantValues.workingTill);
       formData.append("phone", restaurantValues.phone);
-      console.log("before images");
       if (restaurantValues.imageCover && restaurantValues.imageIntro) {
-        console.log("if");
         formData.append("coverImage", restaurantValues.imageCover);
         formData.append("introImage", restaurantValues.imageIntro);
       }
@@ -210,14 +221,6 @@ const RestaurantNew = () => {
               required
             />
             {error.name && <p>{error.name}</p>}
-            <Input
-              name="ownerId"
-              onChange={handleChange}
-              value={restaurantValues.ownerId}
-              required
-            />
-            {error.ownerId && <p>{error.ownerId}</p>}
-
             <Input
               name="email"
               onChange={handleChange}
@@ -305,12 +308,28 @@ const RestaurantNew = () => {
             <div className="flex items-center gap-2 rounded-md bg-green-500 px-3 py-1">
               <button type="submit">Submit</button>
               {isLoading && (
-                <MoonLoader color="rgba(0, 128, 0, 1)" speedMultiplier={0.4} />
+                <MoonLoader
+                  size={15}
+                  color="rgba(0, 128, 0, 1)"
+                  speedMultiplier={0.4}
+                />
               )}
             </div>
           </div>
         </div>
       </form>
+      <ToastContainer
+        position="top-left"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
+      />
     </div>
   );
 };

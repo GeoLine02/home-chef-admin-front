@@ -10,6 +10,9 @@ import ProductList from "./pages/products/ProductList.tsx";
 import "./App.css";
 import RestaurantNew from "./pages/restaurants/RestaurantNew.tsx";
 import RestaurantEdit from "./pages/restaurants/RestaurantEdit.tsx";
+import UserCreate from "./pages/users/UserCreate.tsx";
+import UserList from "./pages/users/UserList.tsx";
+import UserEdit from "./pages/users/UserEdit.tsx";
 
 const router = createBrowserRouter([
   {
@@ -42,6 +45,18 @@ const router = createBrowserRouter([
       {
         path: "/products/create",
         element: <ProductCreate />,
+      },
+      {
+        path: "/users/list",
+        element: <UserList />,
+      },
+      {
+        path: "/users/create",
+        element: <UserCreate />,
+      },
+      {
+        path: "/users/update/:id",
+        element: <UserEdit />,
       },
     ],
   },

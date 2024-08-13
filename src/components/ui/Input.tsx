@@ -2,12 +2,12 @@ import { ChangeEvent } from "react";
 
 interface InputProps {
   name: string;
-  required: boolean;
   onChange: (e: ChangeEvent<HTMLInputElement>) => void;
   value: string; // Changed to string to ensure consistency
+  error?: string;
 }
 
-const Input = ({ name, required, onChange, value }: InputProps) => (
+const Input = ({ name, onChange, value, error }: InputProps) => (
   <>
     <label htmlFor={name}>{name}</label>
     <input
@@ -17,8 +17,8 @@ const Input = ({ name, required, onChange, value }: InputProps) => (
       value={value} // Ensure value is used here
       placeholder={`Enter your ${name}`}
       onChange={onChange}
-      required={required}
     />
+    {error && <p className="text-red-500 text-sm">{error}</p>}{" "}
   </>
 );
 

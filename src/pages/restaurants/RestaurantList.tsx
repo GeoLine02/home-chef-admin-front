@@ -45,7 +45,7 @@ const RestaurantList = () => {
   const columns = [
     {
       accessorKey: "id",
-      header: "ID",
+      header: "id",
     },
     {
       accessorKey: "img",
@@ -53,11 +53,11 @@ const RestaurantList = () => {
     },
     {
       accessorKey: "name",
-      header: "Name",
+      header: "name",
     },
     {
       accessorKey: "email",
-      header: "Email",
+      header: "email",
     },
   ];
 

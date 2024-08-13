@@ -2,12 +2,14 @@ import { configureStore } from "@reduxjs/toolkit";
 import restaurantReducer from "./features/restaurantSlice";
 import tableReducer from "./features/tableSlice";
 import restaurantSettingsReducer from "./features/restaurantSettingsSlice";
+import userReducer from "./features/userSlice";
 
 export const store = configureStore({
   reducer: {
     restaurantReducer: restaurantReducer,
     tableReducer: tableReducer,
     restaurantSettingsReducer: restaurantSettingsReducer,
+    userReducer: userReducer,
   },
 });
 

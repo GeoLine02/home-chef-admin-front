@@ -16,6 +16,7 @@ import { MoonLoader } from "react-spinners";
 import { uploadImageToFirebase } from "../../services/firebaseApi";
 import { useLocation } from "react-router-dom";
 import { toast, ToastContainer } from "react-toastify";
+import validateForm from "../../utils/validateForm";
 
 const RestaurantNew = () => {
   const [imageCoverFile, setImageCoverFile] = useState<File | null>(null);
@@ -48,6 +49,25 @@ const RestaurantNew = () => {
     workingFrom: "",
     workingTill: "",
   });
+
+  const [restaurantErrors, setRestsaurantErrors] = useState({
+    name: "",
+    ownerId: "",
+    countryId: 201,
+    latitude: 0.4234234,
+    longitude: 0.4234234,
+    email: "",
+    address: "",
+    city: "",
+    phone: "",
+    imageCover: imageCoverUrl,
+    imageIntro: imageIntroUrl,
+    workingDays: selectedWorkingDays,
+    restaurantTypes: selectedRestaurantTypes,
+    workingFrom: "",
+    workingTill: "",
+  });
+
   const [workingFrom, setWorkingFrom] = useState("00:00");
   const [workingTill, setWorkingTill] = useState("23:59");
   const [error, setError] = useState<Record<string, string | string[]>>({});
@@ -128,8 +148,17 @@ const RestaurantNew = () => {
         imageIntro: introUrl,
       };
 
-      await validationSchema.validate(restaurantValues, { abortEarly: false });
-      console.log("form data is valid");
+      const { isValid, errors } = await validateForm(
+        validationSchema,
+        updatedValues
+      );
+      if (isValid) {
+        console.log("form data is valid");
+      } else {
+        console.log(errors);
+      }
+      // await validationSchema.validate(restaurantValues, { abortEarly: false });
+      // console.log("form data is valid");
 
       const formData = new FormData();
       formData.append("name", updatedValues.name);
@@ -155,8 +184,12 @@ const RestaurantNew = () => {
         JSON.stringify(updatedValues.restaurantTypes)
       );
 
-      const resp = await createRestaurantService(formData);
-      return resp?.json();
+      if (isValid) {
+        const resp = await createRestaurantService(formData);
+        return resp?.json();
+      } else {
+        setRestsaurantErrors(errors);
+      }
     } catch (error) {
       if (error instanceof Yup.ValidationError) {
         const validationErrors: Record<string, string | string[]> = {};
@@ -212,32 +245,40 @@ const RestaurantNew = () => {
               name="name"
               onChange={handleChange}
               value={restaurantValues.name}
+              error={restaurantErrors.name}
             />
-            {error.name && <p>{error.name}</p>}
             <Input
               name="email"
               onChange={handleChange}
               value={restaurantValues.email}
+              error={restaurantErrors.email}
             />
-            {error.email && <p>{error.email}</p>}
             <Input
               name="address"
               onChange={handleChange}
               value={restaurantValues.address}
+              error={restaurantErrors.address}
             />
-            {error.address && <p>{error.address}</p>}
             <Input
               name="city"
               onChange={handleChange}
               value={restaurantValues.city}
+              error={restaurantErrors.city}
             />
-            {error.city && <p>{error.city}</p>}
+            {!location.state.ownerID && (
+              <Input
+                name="ownerId"
+                onChange={handleChange}
+                value={restaurantValues.ownerId}
+                error={restaurantErrors.ownerId}
+              />
+            )}
             <Input
               name="phone"
               onChange={handleChange}
               value={restaurantValues.phone}
+              error={restaurantErrors.phone}
             />
-            {error.phone && <p>{error.phone}</p>}
           </div>
           <div className="w-[40%]">
             <div className="flex gap-1">
@@ -254,7 +295,6 @@ const RestaurantNew = () => {
                 handleDelete={() => handleDeleteImage("intro")}
               />
             </div>
-
             <div className="mt-3">
               <h1 className="mb-2">Working Days</h1>
               <DropDown

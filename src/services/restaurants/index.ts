@@ -48,6 +48,7 @@ export const createRestaurantService = async (restaurantData: FormData) => {
       body: restaurantData,
     };
     const resp = await http("/restaurant/create", apiCallOptions);
+    console.log(resp);
     return resp;
   } catch (error) {
     console.log(error);

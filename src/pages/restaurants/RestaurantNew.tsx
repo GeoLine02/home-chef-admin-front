@@ -81,6 +81,7 @@ const RestaurantNew = () => {
   useEffect(() => {
     const { state } = location;
     if (state && state.ownerID) {
+      console.log(state.ownerID);
       const userCreationToast = () => toast("User created successfuly!");
       userCreationToast();
       setRestaurantValues({
@@ -152,13 +153,6 @@ const RestaurantNew = () => {
         validationSchema,
         updatedValues
       );
-      if (isValid) {
-        console.log("form data is valid");
-      } else {
-        console.log(errors);
-      }
-      // await validationSchema.validate(restaurantValues, { abortEarly: false });
-      // console.log("form data is valid");
 
       const formData = new FormData();
       formData.append("name", updatedValues.name);
@@ -265,7 +259,7 @@ const RestaurantNew = () => {
               value={restaurantValues.city}
               error={restaurantErrors.city}
             />
-            {!location.state.ownerID && (
+            {restaurantValues.ownerId && (
               <Input
                 name="ownerId"
                 onChange={handleChange}

@@ -9,12 +9,13 @@ import { useParams } from "react-router-dom";
 import { fetchRestaurantByID } from "../../store/features/restaurantSlice";
 import { updateRestaurantService } from "../../services/restaurants";
 import * as Yup from "yup";
-import validationSchema from "./validationSchema";
+import validationSchema from "../../schemas/restaurantValidationSchema";
 import Input from "../../components/ui/Input";
 import Upload from "../../components/ui/Upload";
 import DropDown from "../../components/ui/DropDown";
 import TimeRange from "../../components/ui/TimeRange";
 import { MoonLoader } from "react-spinners";
+import RestaurantsForm from "../../components/restaurants/RestaurantsForm";
 
 const RestaurantEdit = () => {
   const [image, setImage] = useState<File | string | null>(null);
@@ -203,104 +204,27 @@ const RestaurantEdit = () => {
   return (
     <div className="p-5">
       <h1 className="font-bold text-3xl text-black">Edit Restaurant</h1>
-      <form onSubmit={onSubmit}>
-        <div className="flex gap-6 mt-6 w-full">
-          <div className="w-[65%] space-y-2">
-            <Input
-              name="name"
-              onChange={handleChange}
-              value={restaurantValues.name}
-              required
-            />
-            {error.name && <p>{error.name}</p>}
-            <Input
-              name="ownerId"
-              onChange={handleChange}
-              value={restaurantValues.ownerId}
-              required
-            />
-            {error.ownerId && <p>{error.ownerId}</p>}
-
-            <Input
-              name="email"
-              onChange={handleChange}
-              value={restaurantValues.email}
-              required
-            />
-            {error.email && <p>{error.email}</p>}
-            <Input
-              name="address"
-              onChange={handleChange}
-              value={restaurantValues.address}
-              required
-            />
-            {error.address && <p>{error.address}</p>}
-            <Input
-              name="city"
-              onChange={handleChange}
-              value={restaurantValues.city}
-              required
-            />
-            {error.city && <p>{error.city}</p>}
-            <Input
-              name="phone"
-              onChange={handleChange}
-              value={restaurantValues.phone}
-              required
-            />
-            {error.phone && <p>{error.phone}</p>}
-          </div>
-          <div className="w-[40%]">
-            <Upload value={image} onChange={handleFileChange} />
-            {error.file && <p>{error.file}</p>}
-            <div className="mt-3">
-              <h1 className="mb-2">Working Days</h1>
-              <DropDown
-                options={daysOptions}
-                multiSelect={true}
-                selected={selectedWorkingDays}
-                setSelected={setSelectedWorkingDays}
-              />
-              {error.workingDays && <p>{error.workingDays}</p>}
-            </div>
-            <div className="mt-3">
-              <h1 className="mb-2">Restaurant Type</h1>
-              <DropDown
-                options={restaurantTypesOptions}
-                selected={selectedRestaurantTypes}
-                setSelected={setSelectedRestaurantTypes}
-                multiSelect
-              />
-              {error.restaurantTypes && <p>{error.restaurantTypes}</p>}
-            </div>
-            <div className="mt-3">
-              <h1 className="mt-2">Working Hours</h1>
-              <TimeRange
-                minTime={workingFrom}
-                maxTime={workingTill}
-                startTimeHeader="Working from"
-                endTimeHeader="Working till"
-                onChange={onTimeRangeChange}
-              />
-              {error.workingFrom && <p>{error.workingFrom}</p>}
-              {error.workingTill && <p>{error.workingTill}</p>}
-            </div>
-          </div>
-        </div>
-        <div className="w-full py-4 mt-11 bg-dark_backgorund_color">
-          <div className="flex items-center justify-end gap-6 px-14 text-white">
-            <button type="reset" className="rounded-md bg-red-500 px-3 py-1">
-              Discard
-            </button>
-            <div className="rounded-md bg-green-500 px-3 py-1 cursor-pointer">
-              <button type="submit">Submit</button>
-              {isLoading && (
-                <MoonLoader color="rgba(0, 128, 0, 1)" speedMultiplier={0.4} />
-              )}
-            </div>
-          </div>
-        </div>
-      </form>
+      <RestaurantsForm
+        daysOptions={daysOptions}
+        handleChange={handleChange}
+        handleCoverImageUpload={handleCoverImageUpload}
+        handleDeleteImage={handleDeleteImage}
+        handleIntroImageUpload={handleIntroImageUpload}
+        imageCoverUrl={imageCoverUrl}
+        imageIntroUrl={imageIntroUrl}
+        isLoading={isLoading}
+        onSubmit={onSubmit}
+        onTimeRangeChange={onTimeRangeChange}
+        restaurantErrors={restaurantErrors}
+        restaurantTypesOptions={restaurantTypesOptions}
+        restaurantValues={restaurantValues}
+        selectedRestaurantTypes={selectedRestaurantTypes}
+        selectedWorkingDays={selectedWorkingDays}
+        setSelectedRestaurantTypes={setSelectedRestaurantTypes}
+        setSelectedWorkingDays={setSelectedWorkingDays}
+        workingFrom={workingFrom}
+        workingTill={workingTill}
+      />
     </div>
   );
 };

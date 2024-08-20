@@ -19,3 +19,21 @@ export interface IRestaurnatById extends IRestaurant {
   workingFrom: string;
   workingTill: string;
 }
+
+export interface IRestaurantForm {
+  name: string;
+  ownerId: string;
+  countryId: number;
+  latitude: number;
+  longitude: number;
+  email: string;
+  address: string;
+  city: string;
+  phone: string;
+  imageCover: string;
+  imageIntro: string;
+  workingDays: any[] | [];
+  restaurantTypes: number[];
+  workingFrom: string;
+  workingTill: string;
+}

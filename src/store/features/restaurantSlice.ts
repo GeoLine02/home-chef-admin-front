@@ -1,14 +1,18 @@
 import { AsyncThunk, createAsyncThunk, createSlice } from "@reduxjs/toolkit";
 import { ITableData } from "../../types/table";
 import {
+  createRestaurantService,
   getRestaurantByIdService,
   restaurantDeleteService,
   restaurantListService,
 } from "../../services/restaurants";
-import { IRestaurnatById } from "../../types/restaurant";
+import { IRestaurantForm, IRestaurnatById } from "../../types/restaurant";
+
+type IDataFetchingStatus = "idle" | "pending" | "successful" | "rejected";
 
 type InitialStateType = {
   restaurantList: ITableData | null;
+  restaurantCreationStatus: IDataFetchingStatus;
   toggleConfirmationModal: boolean;
   restaurantById: null | IRestaurnatById;
   search: string;
@@ -27,6 +31,7 @@ export interface IRestaurantListPayloadCreator {
 const initialState: InitialStateType = {
   restaurantList: null,
   restaurantById: null,
+  restaurantCreationStatus: "idle",
   toggleConfirmationModal: false,
   selectRestaurantID: null,
   search: "",
@@ -65,6 +70,20 @@ export const fetchRestaurantByID: AsyncThunk<IRestaurnatById, number, object> =
       console.log(error);
     }
   });
+
+// eslint-disable-next-line @typescript-eslint/no-explicit-any
+export const createRestaurant: AsyncThunk<any, IRestaurantForm, object> =
+  createAsyncThunk(
+    "restaurant/create",
+    async (restaurantValues: IRestaurantForm) => {
+      try {
+        const res = await createRestaurantService(restaurantValues);
+        return res;
+      } catch (error) {
+        console.log(error);
+      }
+    }
+  );
 
 export const deleteRestaurant: AsyncThunk<object, string, object> =
   createAsyncThunk("restaurant/delete", async (id: string) => {
@@ -109,6 +128,20 @@ const restaurantSlice = createSlice({
         state.status = "rejected";
         state.isDataFetching = false;
         state.error = action.error;
+      })
+      // restaurant create
+      .addCase(createRestaurant.pending, (state) => {
+        state.isDataFetching = true;
+        state.restaurantCreationStatus = "pending";
+      })
+      .addCase(createRestaurant.fulfilled, (state) => {
+        state.isDataFetching = false;
+        state.restaurantCreationStatus = "successful";
+      })
+      .addCase(createRestaurant.rejected, (state, action) => {
+        state.isDataFetching = false;
+        state.restaurantCreationStatus = "rejected";
+        state.error = action.payload;
       })
       // restaurant delete
       .addCase(deleteRestaurant.pending, (state) => {

@@ -63,19 +63,24 @@ export const createRestaurantService = async (
 // update restaurant by id
 export const updateRestaurantService = async (
   restaurantId: number,
-  formData: FormData
+  restaurantValues: IRestaurantForm
 ) => {
+  console.log(restaurantValues);
   try {
     const apiCallOptions = {
       method: "PATCH",
-      body: formData,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(restaurantValues),
     };
-    console.log("@@@@@@@@@formdata", formData);
     const resp = await http(
       `/restaurant/update/${restaurantId}`,
       apiCallOptions
     );
-    return resp;
+    if (resp.ok) {
+      return resp.json();
+    }
   } catch (error) {
     console.log(error);
   }

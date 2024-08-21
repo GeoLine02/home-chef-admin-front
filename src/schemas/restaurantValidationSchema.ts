@@ -10,6 +10,7 @@ const restaurantValidationSchema = Yup.object().shape({
     .required("Email is required"),
   address: Yup.string().required("Address is required"),
   phone: Yup.string().required("Phone number is required"),
+  city: Yup.string().required("City is required"),
   imageCover: Yup.string()
     .url("Invalid URL for cover image")
     .required("Cover image is required"),

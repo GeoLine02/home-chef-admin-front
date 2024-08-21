@@ -20,6 +20,7 @@ const RestaurantNew = () => {
   const [imageCoverUrl, setImageCoverUrl] = useState<string>("");
   const [imageIntroUrl, setImageIntroUrl] = useState<string>("");
 
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [selectedWorkingDays, setSelectedWorkingDays] = useState<[] | any[]>(
     []
   );
@@ -30,7 +31,7 @@ const RestaurantNew = () => {
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const [restaurantValues, setRestaurantValues] = useState<IRestaurantForm>({
     name: "",
-    ownerId: "",
+    ownerId: undefined,
     countryId: 201,
     latitude: 0.4234234,
     longitude: 0.4234234,
@@ -46,9 +47,9 @@ const RestaurantNew = () => {
     workingTill: "",
   });
 
-  const [restaurantErrors, setRestsaurantErrors] = useState({
+  const [restaurantErrors, setRestsaurantErrors] = useState<IRestaurantForm>({
     name: "",
-    ownerId: "",
+    ownerId: undefined,
     countryId: 201,
     latitude: 0.4234234,
     longitude: 0.4234234,
@@ -157,7 +158,7 @@ const RestaurantNew = () => {
         imageCover: coverUrl,
         imageIntro: introUrl,
       };
-
+      console.log(coverUrl);
       const { isValid, errors } = await validateForm(
         validationSchema,
         updatedValues

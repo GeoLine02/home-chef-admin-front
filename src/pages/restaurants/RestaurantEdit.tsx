@@ -1,4 +1,4 @@
-import { ChangeEvent, FormEvent, useEffect, useMemo, useState } from "react";
+import { ChangeEvent, FormEvent, useEffect, useState } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { AppDispatch, RootState } from "../../store/store";
 import {
@@ -6,19 +6,19 @@ import {
   getWeekDays,
 } from "../../store/features/restaurantSettingsSlice";
 import { useParams } from "react-router-dom";
-import { fetchRestaurantByID } from "../../store/features/restaurantSlice";
-import { updateRestaurantService } from "../../services/restaurants";
-import * as Yup from "yup";
-import validationSchema from "../../schemas/restaurantValidationSchema";
-import Input from "../../components/ui/Input";
-import Upload from "../../components/ui/Upload";
-import DropDown from "../../components/ui/DropDown";
-import TimeRange from "../../components/ui/TimeRange";
-import { MoonLoader } from "react-spinners";
+import {
+  fetchRestaurantByID,
+  updateRestaurant,
+} from "../../store/features/restaurantSlice";
 import RestaurantsForm from "../../components/restaurants/RestaurantsForm";
+import { IRestaurantForm } from "../../types/restaurant";
+import { uploadImageToFirebase } from "../../services/firebaseApi";
+import validateForm from "../../utils/validateForm";
+import restaurantValidationSchema from "../../schemas/restaurantValidationSchema";
+import { toast, ToastContainer } from "react-toastify";
 
 const RestaurantEdit = () => {
-  const [image, setImage] = useState<File | string | null>(null);
+  // eslint-disable-next-line @typescript-eslint/no-explicit-any
   const [selectedWorkingDays, setSelectedWorkingDays] = useState<[] | any[]>(
     []
   );
@@ -26,9 +26,14 @@ const RestaurantEdit = () => {
   const [selectedRestaurantTypes, setSelectedRestaurantTypes] = useState<
     number[]
   >([]);
-  const [restaurantValues, setRestaurantValues] = useState<any>({
+  const [imageCoverFile, setImageCoverFile] = useState<File | null>(null);
+  const [imageIntroFile, setImageIntroFile] = useState<File | null>(null);
+  const [imageCoverUrl, setImageCoverUrl] = useState<string>("");
+  const [imageIntroUrl, setImageIntroUrl] = useState<string>("");
+
+  const [restaurantValues, setRestaurantValues] = useState<IRestaurantForm>({
     name: "",
-    ownerId: "",
+    ownerId: 1,
     countryId: 201,
     latitude: 0.4234234,
     longitude: 0.4234234,
@@ -36,13 +41,34 @@ const RestaurantEdit = () => {
     address: "",
     city: "",
     phone: "",
-    file: image,
+    imageCover: imageCoverUrl,
+    imageIntro: imageIntroUrl,
+    workingDays: selectedWorkingDays,
+    restaurantTypes: selectedRestaurantTypes,
     workingFrom: "",
     workingTill: "",
   });
+
+  const [restaurantErrors, setRestsaurantErrors] = useState<IRestaurantForm>({
+    name: "",
+    ownerId: undefined,
+    countryId: 201,
+    latitude: 0.4234234,
+    longitude: 0.4234234,
+    email: "",
+    address: "",
+    city: "",
+    phone: "",
+    imageCover: imageCoverUrl,
+    imageIntro: imageIntroUrl,
+    workingDays: selectedWorkingDays,
+    restaurantTypes: selectedRestaurantTypes,
+    workingFrom: "",
+    workingTill: "",
+  });
+
   const [workingFrom, setWorkingFrom] = useState("00:00");
   const [workingTill, setWorkingTill] = useState("23:59");
-  const [error, setError] = useState<Record<string, string | string[]>>({});
   const [isLoading, setIsLoading] = useState<boolean>(false);
   const dispatch = useDispatch<AppDispatch>();
   const params = useParams();
@@ -50,7 +76,6 @@ const RestaurantEdit = () => {
   const restaurantByID = useSelector(
     (state: RootState) => state.restaurantReducer.restaurantById
   );
-  console.log("selectedRestaurantTypes", selectedRestaurantTypes);
   const restaurnatTypes = useSelector(
     (state: RootState) => state.restaurantSettingsReducer.restaurnatTypes
   );
@@ -68,24 +93,37 @@ const RestaurantEdit = () => {
     accessorKey: day.id,
     header: day.days,
   }));
+  const restaurantUpdateStatus = useSelector(
+    (state: RootState) => state.restaurantReducer.restaurantUpdateStatus
+  );
+
+  useEffect(() => {
+    if (restaurantUpdateStatus === "successful") {
+      const restaurantUpadeToast = () =>
+        toast("Restaurant updated successfuly");
+      restaurantUpadeToast();
+    }
+  }, [restaurantUpdateStatus]);
 
   useEffect(() => {
     dispatch(fetchRestaurantByID(parseInt(params.id as string)));
   }, [params?.id, dispatch]);
-
   useEffect(() => {
     if (restaurantByID) {
       setRestaurantValues({
         name: restaurantByID.name || "",
-        ownerId: restaurantByID.ownerId || "",
+        ownerId: restaurantByID.ownerId || undefined,
         countryId: 201,
-        latitude: restaurantByID.latitude || 0.4234234,
-        longitude: restaurantByID.longitude || 0.4234234,
+        latitude: restaurantByID.latitude || null,
+        longitude: restaurantByID.longitude || null,
         email: restaurantByID.email || "",
         address: restaurantByID.address || "",
         city: restaurantByID.city || "",
         phone: restaurantByID.phone || "",
-        file: restaurantByID.img || null,
+        imageCover: restaurantByID.coverImage,
+        imageIntro: restaurantByID.introImage,
+        restaurantTypes: restaurantByID.restaurantTypes,
+        workingDays: restaurantByID.workingDays,
         workingFrom: restaurantByID.workingFrom || "",
         workingTill: restaurantByID.workingTill || "",
       });
@@ -97,8 +135,6 @@ const RestaurantEdit = () => {
       setSelectedWorkingDays([...restaurantByID.workingDays]);
     }
   }, [restaurantByID?.workingDays]);
-
-  console.log("selectedWorkingDays", selectedWorkingDays);
 
   useEffect(() => {
     dispatch(getRestaurntTypes());
@@ -126,20 +162,39 @@ const RestaurantEdit = () => {
 
   const handleChange = (e: ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target;
-    console.log("name", name);
-    console.log("value", value);
     setRestaurantValues((prevValues) => ({
       ...prevValues,
       [name]: value,
     }));
   };
 
-  const handleFileChange = (file: File | null) => {
-    setImage(file);
-    setRestaurantValues((prevValues) => ({
-      ...prevValues,
-      file: file,
-    }));
+  const handleCoverImageUpload = (file: File | null) => {
+    if (file) {
+      setImageCoverUrl(URL.createObjectURL(file));
+    } else {
+      setImageCoverUrl("");
+    }
+    setImageCoverFile(file);
+  };
+
+  const handleIntroImageUpload = (file: File | null) => {
+    if (file) {
+      setImageIntroUrl(URL.createObjectURL(file));
+    } else {
+      setImageIntroUrl("");
+    }
+    setImageIntroFile(file);
+  };
+
+  const handleDeleteImage = (type: "cover" | "intro") => {
+    if (type === "cover") {
+      setImageCoverUrl("");
+      setImageCoverFile(null);
+    }
+    if (type === "intro") {
+      setImageIntroUrl("");
+      setImageIntroFile(null);
+    }
   };
 
   const onTimeRangeChange = (start: string, end: string) => {
@@ -151,51 +206,37 @@ const RestaurantEdit = () => {
     setIsLoading(true);
     e.preventDefault();
     try {
+      let coverUrl = imageCoverUrl;
+      let introUrl = imageIntroUrl;
+
+      if (imageCoverFile && imageIntroFile) {
+        coverUrl = await uploadImageToFirebase(imageCoverFile, "cover");
+        introUrl = await uploadImageToFirebase(imageIntroFile, "intro");
+      }
+
       const combinedValues = {
         ...restaurantValues,
-        restaurantTypes: selectedRestaurantTypes,
-        workingDays: selectedWorkingDays,
+        imageCover: coverUrl,
+        imageIntro: introUrl,
       };
 
-      await validationSchema.validate(combinedValues, { abortEarly: false });
-      console.log("form data is valid");
-      const formData = new FormData();
-      formData.append("name", restaurantValues.name);
-      formData.append("address", restaurantValues.address);
-      formData.append("city", restaurantValues.city);
-      formData.append("countryId", restaurantValues.countryId.toString());
-      formData.append("latitude", restaurantValues.latitude.toString());
-      formData.append("longitude", restaurantValues.longitude.toString());
-      formData.append("ownerId", restaurantValues.ownerId.toString());
-      formData.append("email", restaurantValues.email);
-      formData.append("workingFrom", restaurantValues.workingFrom);
-      formData.append("workingTill", restaurantValues.workingTill);
-      formData.append("phone", restaurantValues.phone);
-      if (restaurantValues.file) {
-        formData.append("file", restaurantValues.file);
+      const { isValid, errors } = await validateForm(
+        restaurantValidationSchema,
+        combinedValues
+      );
+
+      if (isValid) {
+        dispatch(
+          updateRestaurant({
+            restaurantID: parseInt(params?.id as string),
+            restaurantValues: combinedValues,
+          })
+        );
+      } else {
+        setRestsaurantErrors(errors);
       }
-      formData.append("workingDays", JSON.stringify(selectedWorkingDays));
-      formData.append(
-        "restaurantTypes",
-        JSON.stringify(selectedRestaurantTypes)
-      );
-      const resp = await updateRestaurantService(
-        parseInt(params?.id as string),
-        formData
-      );
-      return resp?.json();
     } catch (error) {
-      setIsLoading(false);
       console.log(error);
-      if (error instanceof Yup.ValidationError) {
-        const validationErrors: Record<string, string | string[]> = {};
-        error.inner.forEach((err) => {
-          if (err.path) {
-            validationErrors[err.path] = error.message;
-          }
-        });
-        setError(validationErrors);
-      }
     } finally {
       setIsLoading(false);
     }
@@ -224,6 +265,18 @@ const RestaurantEdit = () => {
         setSelectedWorkingDays={setSelectedWorkingDays}
         workingFrom={workingFrom}
         workingTill={workingTill}
+      />
+      <ToastContainer
+        position="top-left"
+        autoClose={5000}
+        hideProgressBar={false}
+        newestOnTop={false}
+        closeOnClick
+        rtl={false}
+        pauseOnFocusLoss
+        draggable
+        pauseOnHover
+        theme="light"
       />
     </div>
   );

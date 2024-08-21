@@ -1,6 +1,6 @@
 import * as Yup from "yup";
 
-const validationSchema = Yup.object().shape({
+const restaurantValidationSchema = Yup.object().shape({
   name: Yup.string()
     .required("Restaurant name is required")
     .min(3, "Restaurant must be at least 3 characters")
@@ -10,6 +10,7 @@ const validationSchema = Yup.object().shape({
     .required("Email is required"),
   address: Yup.string().required("Address is required"),
   phone: Yup.string().required("Phone number is required"),
+  city: Yup.string().required("City is required"),
   imageCover: Yup.string()
     .url("Invalid URL for cover image")
     .required("Cover image is required"),
@@ -36,4 +37,4 @@ const validationSchema = Yup.object().shape({
   workingTill: Yup.string().required("Working hours are required"),
 });
 
-export default validationSchema;
+export default restaurantValidationSchema;

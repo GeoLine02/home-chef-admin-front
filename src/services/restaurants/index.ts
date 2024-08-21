@@ -1,4 +1,5 @@
 import { IRestaurantListPayloadCreator } from "../../store/features/restaurantSlice";
+import { IRestaurantForm } from "../../types/restaurant";
 import { http } from "../../utils/http";
 
 // restaurant list
@@ -41,15 +42,19 @@ export const getRestaurantByIdService = async (id: number) => {
 };
 
 // create restaurant
-export const createRestaurantService = async (restaurantData: FormData) => {
+export const createRestaurantService = async (
+  restaurantData: IRestaurantForm
+) => {
   try {
     const apiCallOptions = {
+      headers: {
+        "Content-Type": "application/json",
+      },
       method: "POST",
-      body: restaurantData,
+      body: JSON.stringify(restaurantData),
     };
     const resp = await http("/restaurant/create", apiCallOptions);
-    console.log(resp);
-    return resp;
+    return resp.json();
   } catch (error) {
     console.log(error);
   }
@@ -58,19 +63,24 @@ export const createRestaurantService = async (restaurantData: FormData) => {
 // update restaurant by id
 export const updateRestaurantService = async (
   restaurantId: number,
-  formData: FormData
+  restaurantValues: IRestaurantForm
 ) => {
+  console.log(restaurantValues);
   try {
     const apiCallOptions = {
       method: "PATCH",
-      body: formData,
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify(restaurantValues),
     };
-    console.log("@@@@@@@@@formdata", formData);
     const resp = await http(
       `/restaurant/update/${restaurantId}`,
       apiCallOptions
     );
-    return resp;
+    if (resp.ok) {
+      return resp.json();
+    }
   } catch (error) {
     console.log(error);
   }
